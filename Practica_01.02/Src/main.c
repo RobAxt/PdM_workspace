@@ -120,6 +120,32 @@ void LED_blink(Led_TypeDef led, uint32_t timeOn, uint32_t timeOff)
 	HAL_Delay(timeOff);
 }
 
+
+/* Respuestas a preguntas para pensar:
+ *
+ * * Al usar un array queda en un unico lugar del código la especificacion
+ *   de la secuencia a utilizar.
+ *
+ * * En el esquematico de la placa hay un circuito RC que se encarga de
+ *   minimizar el efecto de los rebotes del pulsador.
+ *
+ * * La diferencia entre implementar la lectura del PB entre cada secuencia
+ *   o entre cada parpadeo es que el usuario observará una demora en el tiempo
+ *   de respuesta entre que se presiona el boton y se observa el cambio de secuencia.
+ *   En esta implementación el usuario debe esperar que termine la secuencia actual
+ *   para que observe el cambio de secuencia.
+ *
+ * * La forma mas eficiente seria implementar una interrupción por flanco
+ *   ascendente y descendente para modificar el tipo de sucuencia a ejecutar.
+ *   De esta manera solo debe esperar a que una funcion LED_blink termine para
+ *   observar el cambio de secuencia (esto se debe a que se usa HAL_Delay
+ *   que es bloqueante)
+ *
+ * * Al ser bloquante la funcion de demora no importa si se usa una interrupcion
+ *   o se lee el PB dentro del ciclo for, siempre hay que esperar a que termine
+ *   uno de los llamados a LED_blink.
+ */
+
 /**
   * @brief  System Clock Configuration
   *         The system Clock is configured as follow : 
