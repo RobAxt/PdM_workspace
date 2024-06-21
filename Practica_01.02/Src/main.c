@@ -30,12 +30,17 @@
   */
 
 /* Private typedef -----------------------------------------------------------*/
+
+typedef enum
+{
+  UPsEQUENCE = 0,
+  DOWNsEQUENCE
+} LED_sequence_t;
+
 /* Private define ------------------------------------------------------------*/
 
 #define TIMEoN  200
 #define TIMEoFF 200
-#define UPsEQUENCE   0
-#define DOWNsEQUENCE 1
 
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
@@ -51,6 +56,7 @@ static void SystemClock_Config(void);
 static void Error_Handler(void);
 
 void LED_blink(Led_TypeDef led, uint32_t timeOn, uint32_t timeOff);
+LED_sequence_t PB_USER_sequence(void);
 
 /* Private functions ---------------------------------------------------------*/
 
@@ -80,19 +86,17 @@ int main(void)
   BSP_LED_Init(LED1);
   BSP_LED_Init(LED2);
   BSP_LED_Init(LED3);
+
+  /* Initialize BSP PB for BUTTON_USER */
   BSP_PB_Init(BUTTON_USER, BUTTON_MODE_GPIO);
 
   const uint8_t MAXlED = sizeof(LED_sequence[0]) / sizeof(Led_TypeDef);
-  uint8_t PB_sequence = UPsEQUENCE;
-
+  LED_sequence_t PB_sequence = UPsEQUENCE;
 
   /* Infinite loop */
   while (1)
   {
-	if(BSP_PB_GetState(BUTTON_USER))
-	  PB_sequence = UPsEQUENCE;
-	else
-	  PB_sequence = DOWNsEQUENCE;
+	PB_sequence = PB_USER_sequence();
 
 	for(uint8_t i=0; i < MAXlED; i++)
 	{
@@ -120,6 +124,15 @@ void LED_blink(Led_TypeDef led, uint32_t timeOn, uint32_t timeOff)
 	HAL_Delay(timeOff);
 }
 
+/**
+  * @brief  Read user pushbutton and returns the selected led sequence.
+  * @param  None
+  * @retval LED_sequence_t: Return one of the two the sequence.
+  */
+LED_sequence_t PB_USER_sequence(void)
+{
+	return BSP_PB_GetState(BUTTON_USER)? DOWNsEQUENCE : UPsEQUENCE;
+}
 
 /* Respuestas a preguntas para pensar:
  *
