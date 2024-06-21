@@ -91,6 +91,17 @@ int main(void)
   }
 }
 
+/**
+  * @brief  Blink led one time.
+  * @param  led: Specifies the Led to be blinked.
+   *   This parameter can be one of following parameters:
+   *	  @arg  LED1
+   *	  @arg  LED2
+   *	  @arg  LED3
+  * @param	timeOn: Specifies the time the led will remain on.
+  * @param	timeOff: Specifies the time the led will remain off.
+  * @retval None
+  */
 void LED_blink(Led_TypeDef led, uint32_t timeOn, uint32_t timeOff)
 {
 	BSP_LED_On(led);
