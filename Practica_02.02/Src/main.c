@@ -32,8 +32,7 @@
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 
-#define LED1PERIOD 200
-#define LED1DUTY 0.5
+#define LED1hALFpERIOD 100
 
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
@@ -78,7 +77,7 @@ int main(void)
   BSP_LED_Off(LED1);
 
   /* Initialize delay for LED1*/
-  delayInit(&delayLED1, LED1PERIOD * LED1DUTY);
+  delayInit(&delayLED1, LED1hALFpERIOD);
 
   while(1)
   {

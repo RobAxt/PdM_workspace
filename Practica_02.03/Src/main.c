@@ -37,6 +37,12 @@ typedef struct
   float duty;
 } LED_pattern_t;
 
+typedef enum
+{
+  OFF = false,
+  ON  = true
+} LED_state_t;
+
 /* Private define ------------------------------------------------------------*/
 
 #define MAXpATTERN 3
@@ -81,29 +87,45 @@ int main(void)
   BSP_LED_Off(LED1);
 
   /* Declare and Initialize working local variables */
-  delay_t delayLED1 = {0, 0, false};
-  LED_pattern_t LED_pattern[] = {
-  		                          { 10, 1000, 0.5 },
-                                  { 10,  200, 0.5 },
-                                  { 10,  100, 0.5 },
-                                };
+  LED_state_t LEDState = OFF;
   uint32_t patternCount = 0;
   uint32_t timesCount = 0;
-
+  delay_t onDelayLED1  = {0, 0, false};
+  delay_t offDelayLED1 = {0, 0, false};
+  LED_pattern_t LEDPattern[] = {
+  		                         { 5, 1000, 0.5 },
+                                 { 5,  200, 0.5 },
+                                 { 5,  100, 0.5 },
+                               };
   while(1)
   {
-	delayInit(&delayLED1, LED_pattern[patternCount].period * LED_pattern[patternCount].duty);
+	delayInit(&onDelayLED1,  LEDPattern[patternCount].period * LEDPattern[patternCount].duty);
+	delayInit(&offDelayLED1, LEDPattern[patternCount].period * (1 - LEDPattern[patternCount].duty));
 
-	while(timesCount < LED_pattern[patternCount].times)
+	while(timesCount < LEDPattern[patternCount].times)
 	{
-	  if(false == delayRead(&delayLED1)) // If time runs out... then toggle LED
+	  if(OFF == LEDState)
 	  {
-	    BSP_LED_Toggle(LED1);
-	    timesCount++;
+	    if(false == delayRead(&offDelayLED1))
+	    {
+	      BSP_LED_On(LED1);
+	      LEDState = ON;
+	      delayRead(&onDelayLED1);
+	    }
+	  }
+	  else
+	  {
+	    if(false == delayRead(&onDelayLED1))
+		{
+		  BSP_LED_Off(LED1);
+		  LEDState = OFF;
+		  delayRead(&offDelayLED1);
+		  timesCount++;
+		}
 	  }
 	}
-
-	patternCount = ++patternCount % MAXpATTERN;
+    timesCount = 0;
+	patternCount = (patternCount + 1) % MAXpATTERN;
   }
 }
 
