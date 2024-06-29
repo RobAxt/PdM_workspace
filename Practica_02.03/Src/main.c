@@ -32,7 +32,7 @@
 /* Private typedef -----------------------------------------------------------*/
 typedef struct
 {
-  uint32_t times;
+  uint8_t times;
   uint32_t period;
   float duty;
 } LED_pattern_t;
@@ -44,9 +44,6 @@ typedef enum
 } LED_state_t;
 
 /* Private define ------------------------------------------------------------*/
-
-#define MAXpATTERN 3
-
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /* UART handler declaration */
@@ -88,15 +85,17 @@ int main(void)
 
   /* Declare and Initialize working local variables */
   LED_state_t LEDState = OFF;
-  uint32_t patternCount = 0;
-  uint32_t timesCount = 0;
+  uint8_t patternCount = 0;
+  uint8_t timesCount   = 0;
   delay_t onDelayLED1  = {0, 0, false};
   delay_t offDelayLED1 = {0, 0, false};
   LED_pattern_t LEDPattern[] = {
-  		                         { 5, 1000, 0.5 },
+                                 { 5, 1000, 0.5 },
                                  { 5,  200, 0.5 },
                                  { 5,  100, 0.5 },
                                };
+  const uint8_t MAXpATTERN = sizeof(LEDPattern) / sizeof(LEDPattern[0]);
+
   while(1)
   {
 	delayInit(&onDelayLED1,  LEDPattern[patternCount].period * LEDPattern[patternCount].duty);
