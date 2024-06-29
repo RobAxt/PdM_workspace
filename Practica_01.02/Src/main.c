@@ -126,6 +126,7 @@ void LED_blink(Led_TypeDef led, uint32_t timeOn, uint32_t timeOff)
 
 /**
   * @brief  Read user pushbutton and returns the selected led sequence.
+  *         Assumption: work with the PB level, not with the transition!!!
   * @param  None
   * @retval LED_sequence_t: Return one of the two the sequence.
   */
