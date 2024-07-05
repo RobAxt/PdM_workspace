@@ -24,6 +24,9 @@ typedef struct
   bool_t running;
 } delay_t;
 
+/* Exported constants --------------------------------------------------------*/
+#define MAXdELAY 60000
+
 /* Exported functions ------------------------------------------------------- */
 void delayInit(delay_t * delay, tick_t duration);
 bool_t delayRead(delay_t * delay);

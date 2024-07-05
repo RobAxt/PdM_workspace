@@ -17,7 +17,7 @@
   */
 void delayInit( delay_t * delay, tick_t duration )
 {
-  if(NULL != delay)
+  if(NULL != delay && MAXdELAY >= duration)
   {
 	delay->startTime = 0;
 	delay->duration  = duration;
@@ -59,7 +59,7 @@ bool_t delayRead(delay_t * delay)
   */
 void delayWrite(delay_t * delay, tick_t duration)
 {
-  if(NULL != delay)
+  if(NULL != delay && MAXdELAY >= duration)
   {
     delay->duration  = duration;
   }

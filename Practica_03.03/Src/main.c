@@ -93,13 +93,13 @@ int main(void)
 	{
 	  if(false == delayIsRunning(&delay))
 	  {
-		tiemposCount = (tiemposCount + 1 ) % MAXtIEMPOS;
-		delayWrite(&delay, TIEMPOS[tiemposCount]);
+        tiemposCount = (tiemposCount + 1 ) % MAXtIEMPOS;
+        delayWrite(&delay, TIEMPOS[tiemposCount]);
 	    cycleCount = 0;
 	  }
 	  else
 	  {
-	     delayRead(&delay);
+        delayRead(&delay);
 	  }
 	}
   }
