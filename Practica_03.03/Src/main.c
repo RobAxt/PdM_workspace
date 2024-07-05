@@ -97,6 +97,10 @@ int main(void)
 		delayWrite(&delay, TIEMPOS[tiemposCount]);
 	    cycleCount = 0;
 	  }
+	  else
+	  {
+	     delayRead(&delay);
+	  }
 	}
   }
 }
