@@ -1,5 +1,5 @@
 /*
- * HD44780.h
+ * API_HD44780.h
  *
  *  Created on: Jul 4, 2024
  *      Author: raxt
@@ -17,11 +17,17 @@
  *    │                          │
  *    │         HD44780          │
  *    └──────────────────────────┘
- *  * P3 connected to a transistor to turn on/off the backlight
+ *  * P3 is connected to a transistor that turns on/off the backlight
  */
 
-#ifndef API_HD44780_INC_HD44780_H_
-#define API_HD44780_INC_HD44780_H_
+#ifndef API_HD44780_INC_API_HD44780_H_
+#define API_HD44780_INC_API_HD44780_H_
+
+/* Includes ------------------------------------------------------------------*/
+
+#include <stdint.h>
+
+/*----------------------------------------------------------------------------*/
 
 /* Exported constants --------------------------------------------------------*/
 
@@ -34,14 +40,23 @@
 #define BLoFF      0x00
 #define BLoN       0x08
 
-#define LCDaDDRESS 0x27
+#define PCF8574MINaDDRESS 0x20
+#define PCF8574MAXaDDRESS 0x27
+
+/*----------------------------------------------------------------------------*/
+
+/* Exported types ------------------------------------------------------------*/
+
+typedef struct API_HD44780_s *API_HD44780_t;
+
+typedef enum { BACKLIGHToN = BLoN, BACKLIGHToFF = BLoFF } backlight_t;
 
 /*----------------------------------------------------------------------------*/
 
 /* Exported functions prototypes ---------------------------------------------*/
 
-
+void API_HD44780_Init(API_HD44780_t lcdInstance, uint8_t address, backlight_t backLight);
 
 /*----------------------------------------------------------------------------*/
 
-#endif /* API_HD44780_INC_HD44780_H_ */
+#endif /* API_HD44780_INC_API_HD44780_H_ */
