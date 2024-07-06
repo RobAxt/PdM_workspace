@@ -50,9 +50,13 @@ struct API_HD44780_s
 #define SMdISPLAY       0x08   // SHIFTmODE | Shift Display
 #define SMlEFT          0x00   // SHIFTmODE | Shift to Left
 #define SMrIGHT         0x04   // SHIFTmODE | Shift to Right
-#define INITcMD1        0x03   // Magical init command 1
-#define INITcMD2        0x02   // Magical init command 2
+#define INITcMD1        0x30   // Magical init command 1
+#define INITcMD2        0x20   // Magical init command 2
 #define NIBBLEmODE      0x28   // Function Set | Nibble Bus | 2 Lines LCD | 5x7 Character Matrix
+#define SETDDRAM        0x80   // SETDDRAM | address
+
+#define LINE1aDDRESS 0x00
+#define LINE2aDDRESS 0x40
 
 /*----------------------------------------------------------------------------*/
 
@@ -61,6 +65,7 @@ struct API_HD44780_s
 void API_HD44780_Write_DataNibble(API_HD44780_t lcdInstance, uint8_t nibble, uint8_t rs, uint8_t rw);
 void API_HD44780_Write_Data(API_HD44780_t lcdInstance, uint8_t nibble, uint8_t rs, uint8_t rw);
 void API_HD44780_InitLCD(API_HD44780_t lcdInstance);
+
 /*----------------------------------------------------------------------------*/
 
 /* API code ------------------------------------------------------------------*/
@@ -120,19 +125,17 @@ void API_HD44780_SetBacklight(API_HD44780_t lcdInstance, backlight_t backLight)
   * @param  lcdInstance: pointer to the LCD instance structure.
   * @param  address:
   * @param  backLight:
-  * @retval None.
+  * @retval API_HD44780_t.
   */
-void API_HD44780_Init(API_HD44780_t lcdInstance, uint8_t address, backlight_t backLight)
+API_HD44780_t API_HD44780_Init(uint8_t address, backlight_t backLight)
 {
-  if(PCF8574MAXaDDRESS >= address && PCF8574MINaDDRESS <= address)
-    lcdInstance->address = address;
-  else
-    lcdInstance->address = PCF8574MAXaDDRESS;
+  static struct API_HD44780_s this = {0};
 
-  if(BACKLIGHToN == backLight || BACKLIGHToFF == backLight)
-    lcdInstance->backLight = backLight;
+  API_HD44780_SetAddress(&this, address);
+  API_HD44780_SetBacklight(&this, backLight);
+  API_HD44780_InitLCD(&this);
 
-  API_HD44780_InitLCD(lcdInstance);
+  return &this;
 }
 
 /**
@@ -142,7 +145,11 @@ void API_HD44780_Init(API_HD44780_t lcdInstance, uint8_t address, backlight_t ba
   */
 void API_HD44780_InitLCD(API_HD44780_t lcdInstance)
 {
-  const uint8_t initCommands[] = { NIBBLEmODE, DISPLAYmODE, RETURNhOME, ENTRYmODE|EMiNCREMENT, DISPLAYmODE|DMdISPLAYoN, CLEARdISPLAY };
+  const uint8_t initCommands[] = {
+		                           NIBBLEmODE, DISPLAYmODE|DMdISPLAYoFF|DMcURSORoFF,
+		                           RETURNhOME, ENTRYmODE|EMnORMAL|EMiNCREMENT,
+								   DISPLAYmODE|DMdISPLAYoN|DMcURSORoFF, CLEARdISPLAY
+                                 };
   const uint8_t MAXcOMMANDS = sizeof(initCommands)/sizeof(initCommands[0]);
 
   API_HD44780_HAL_Delay(DELAY20MS);
@@ -156,21 +163,57 @@ void API_HD44780_InitLCD(API_HD44780_t lcdInstance)
   for(uint8_t i=0; i<MAXcOMMANDS; i++)
   {
     API_HD44780_Write_Data(lcdInstance, initCommands[i], RScMD, RWwRITE);
+    API_HD44780_HAL_Delay(DELAY2MS);
   }
+
 }
 
 /**
   * @brief  Clear Display and set cursor to start of first line.
   * @param  lcdInstance: pointer to the LCD instance structure.
-  * @param  payload: byte of payload to write to the I2C byte.
-  * @param  rs: select the instruction register or the data register.
-  * @param  rw: perform read or write operation.
   * @retval None.
   */
 void API_HD44780_ClearDisplay(API_HD44780_t lcdInstance)
 {
   API_HD44780_Write_Data(lcdInstance, CLEARdISPLAY, RScMD, RWwRITE);
   API_HD44780_HAL_Delay(DELAY2MS);
+}
+
+/**
+  * @brief  Write a character to LCD
+  * @param  lcdInstance: pointer to the LCD instance structure.
+  * @param  ascii: valid ASCII character to write to LCD
+  * @retval None.
+  */
+void API_HD44780_SendChar(API_HD44780_t lcdInstance, uint8_t ascii)
+{
+  if(VALIDmINaSCII <= ascii || VALIDmAXaSCII >= ascii)
+    API_HD44780_Write_Data(lcdInstance, ascii, RSdATA, RWwRITE);
+}
+
+/**
+  * @brief  Wire a string to the LCD
+  * @param  lcdInstance: pointer to the LCD instance structure.
+  * @param  string: string of valid ASCII character to write to LCD
+  * @retval None.
+  */
+void API_HD44780_SendString(API_HD44780_t lcdInstance, uint8_t *string)
+{
+  while(NULL != string && 0 != *string)
+    API_HD44780_SendChar(lcdInstance, *(string++));
+}
+
+/**
+  * @brief  Set cursor to a specific position on the LCD
+  * @param  lcdInstance: pointer to the LCD instance structure.
+  * @param  line: the specific line to set the cursor
+  * @param  offset: the specific offset to set the cursor
+  * @retval None.
+  */
+void API_HD44780_SetCursor(API_HD44780_t lcdInstance, uint8_t line, uint8_t offset)
+{
+  if((LINE1 == line || LINE2 == line) && DISPLAYlINEsIZE > offset)
+    API_HD44780_Write_Data(lcdInstance, SETDDRAM | (LINE2 == line?LINE2aDDRESS:LINE1aDDRESS + offset), RScMD, RWwRITE);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -206,9 +249,9 @@ void API_HD44780_Write_DataNibble(API_HD44780_t lcdInstance, uint8_t nibble, uin
 {
   if(NULL != lcdInstance && (RScMD == rs || RSdATA == rs) && (RWwRITE == rw || RWrEAD == rw))
   {
-    API_HD44780_HAL_I2C_Write(lcdInstance, nibble | lcdInstance->backLight |  ENsET  | rw | rs);
+    API_HD44780_HAL_I2C_Write(lcdInstance, nibble + lcdInstance->backLight +  ENsET  + rw + rs);
     API_HD44780_HAL_Delay(DELAY1MS);
-    API_HD44780_HAL_I2C_Write(lcdInstance, nibble | lcdInstance->backLight | ENuNSET | rw | rs);
+    API_HD44780_HAL_I2C_Write(lcdInstance, nibble + lcdInstance->backLight + ENuNSET + rw + rs);
     API_HD44780_HAL_Delay(DELAY1MS);
   }
 }

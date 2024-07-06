@@ -31,11 +31,14 @@
 
 /* Exported constants --------------------------------------------------------*/
 
-#define BLoFF      0x00
-#define BLoN       0x08
-
 #define PCF8574MINaDDRESS 0x20
 #define PCF8574MAXaDDRESS 0x27
+#define VALIDmINaSCII     0x20  // space
+#define VALIDmAXaSCII     0x7F  // HD44780 datasheet table 4 "Correspondence between Character Codes and Character Patterns"
+#define DISPLAYlINES      2
+#define DISPLAYlINEsIZE   16
+#define LINE1		      0x01
+#define LINE2		      0x02
 
 /*----------------------------------------------------------------------------*/
 
@@ -43,14 +46,17 @@
 
 typedef struct API_HD44780_s * API_HD44780_t;
 
-typedef enum { BACKLIGHToN = BLoN, BACKLIGHToFF = BLoFF } backlight_t;
+typedef enum { BACKLIGHToN = 0x08, BACKLIGHToFF = 0x00 } backlight_t;
 
 /*----------------------------------------------------------------------------*/
 
 /* Exported functions prototypes ---------------------------------------------*/
 
-void API_HD44780_Init(API_HD44780_t lcdInstance, uint8_t address, backlight_t backLight);
+API_HD44780_t API_HD44780_Init(uint8_t address, backlight_t backLight);
 void API_HD44780_ClearDisplay(API_HD44780_t lcdInstance);
+void API_HD44780_SendChar(API_HD44780_t lcdInstance, uint8_t ascii);
+void API_HD44780_SendString(API_HD44780_t lcdInstance, uint8_t *string);
+void API_HD44780_SetCursor(API_HD44780_t lcdInstance, uint8_t line, uint8_t offset);
 
 uint8_t     API_HD44780_GetAddress(API_HD44780_t lcdInstance);
 void        API_HD44780_SetAddress(API_HD44780_t lcdInstance, uint8_t address);

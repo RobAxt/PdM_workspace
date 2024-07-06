@@ -37,7 +37,7 @@ void API_HD44780_HAL_Delay(uint32_t delay)
   */
 void API_HD44780_HAL_I2C_Write(API_HD44780_t lcdInstance, uint8_t payload)
 {
-  HAL_I2C_Master_Transmit(&hi2c1, API_HD44780_GetAddress(lcdInstance), &payload, sizeof(payload), HAL_MAX_DELAY);
+  HAL_I2C_Master_Transmit(&hi2c1, API_HD44780_GetAddress(lcdInstance)<<1, &payload, sizeof(payload), HAL_MAX_DELAY);
 }
 
 /*----------------------------------------------------------------------------*/
