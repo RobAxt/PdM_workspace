@@ -33,6 +33,7 @@ struct API_HD44780_s
 
 #define MSnIBBLE  0xf0
 #define LSnIBBLE  0x04
+#define EOL       '\0'
 
 #define CLEARdISPLAY    0x01   // Clear Screen and Move Cursor To First Line
 #define RETURNhOME      0x02   // Return Home
@@ -145,18 +146,23 @@ API_HD44780_t API_HD44780_Init(uint8_t address, backlight_t backLight)
   */
 void API_HD44780_InitLCD(API_HD44780_t lcdInstance)
 {
-  API_HD44780_HAL_Delay(20);
-  API_HD44780_Write_DataNibble(lcdInstance, 0x30, RScMD, RWwRITE);
-  API_HD44780_HAL_Delay(10);
-  API_HD44780_Write_DataNibble(lcdInstance, 0x30, RScMD, RWwRITE);
-  API_HD44780_HAL_Delay(1);
-  API_HD44780_Write_DataNibble(lcdInstance, 0x30, RScMD, RWwRITE);
-  API_HD44780_Write_DataNibble(lcdInstance, 0x20, RScMD, RWwRITE);
+  const uint8_t initCommands[] = {
+		                           NIBBLEmODE, DISPLAYmODE|DMdISPLAYoFF|DMcURSORoFF,
+		                           RETURNhOME, ENTRYmODE|EMnORMAL|EMiNCREMENT,
+								   DISPLAYmODE|DMdISPLAYoN|DMcURSORoFF, CLEARdISPLAY
+                                 };
+  const uint8_t MAXcOMMANDS = sizeof(initCommands)/sizeof(initCommands[0]);
 
-  API_HD44780_Write_Data(lcdInstance, 0x28, RScMD, RWwRITE);
-  API_HD44780_Write_Data(lcdInstance, 0x0C, RScMD, RWwRITE);
-  API_HD44780_Write_Data(lcdInstance, 0x06, RScMD, RWwRITE);
-  API_HD44780_Write_Data(lcdInstance, 0x01, RScMD, RWwRITE);
+  API_HD44780_HAL_Delay(DELAY20MS);
+  API_HD44780_Write_DataNibble(lcdInstance, INITcMD1, RScMD, RWwRITE);
+  API_HD44780_HAL_Delay(DELAY10MS);
+  API_HD44780_Write_DataNibble(lcdInstance, INITcMD1, RScMD, RWwRITE);
+  API_HD44780_HAL_Delay(DELAY1MS);
+  API_HD44780_Write_DataNibble(lcdInstance, INITcMD1, RScMD, RWwRITE);
+  API_HD44780_Write_DataNibble(lcdInstance, INITcMD2, RScMD, RWwRITE);
+
+  for(uint8_t i=0; i<MAXcOMMANDS; i++)
+    API_HD44780_Write_Data(lcdInstance, initCommands[i], RScMD, RWwRITE);
 }
 
 /**
@@ -190,7 +196,7 @@ void API_HD44780_SendChar(API_HD44780_t lcdInstance, uint8_t ascii)
   */
 void API_HD44780_SendString(API_HD44780_t lcdInstance, uint8_t *string)
 {
-  while(NULL != string && 0 != *string)
+  while(NULL != string && EOL != *string)
     API_HD44780_SendChar(lcdInstance, *(string++));
 }
 
@@ -204,7 +210,7 @@ void API_HD44780_SendString(API_HD44780_t lcdInstance, uint8_t *string)
 void API_HD44780_SetCursor(API_HD44780_t lcdInstance, uint8_t line, uint8_t offset)
 {
   if((LINE1 == line || LINE2 == line) && DISPLAYlINEsIZE > offset)
-    API_HD44780_Write_Data(lcdInstance, SETDDRAM | (LINE2 == line?LINE2aDDRESS:LINE1aDDRESS + offset), RScMD, RWwRITE);
+    API_HD44780_Write_Data(lcdInstance, SETDDRAM | ((LINE2 == line?LINE2aDDRESS:LINE1aDDRESS) + offset), RScMD, RWwRITE);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -229,7 +235,7 @@ void API_HD44780_Write_Data(API_HD44780_t lcdInstance, uint8_t payload, uint8_t 
 }
 
 /**
-  * @brief  Write nibble of data --> [D7 D6 D5 D4] and low nibble of settings -->[ BL E RW RS] to I2C port hardware specific.
+  * @brief  Write high nibble of data --> [D7 D6 D5 D4] and low nibble of settings -->[ BL E RW RS] to I2C port hardware specific.
   * @param  lcdInstance: pointer to the LCD instance structure.
   * @param  nibble: nibble of data to write to the I2C byte.
   * @param  rs: select the instruction register or the data register.
@@ -240,9 +246,9 @@ void API_HD44780_Write_DataNibble(API_HD44780_t lcdInstance, uint8_t nibble, uin
 {
   if(NULL != lcdInstance && (RScMD == rs || RSdATA == rs) && (RWwRITE == rw || RWrEAD == rw))
   {
-    API_HD44780_HAL_I2C_Write(lcdInstance, nibble | 0x08 |  ENsET  | rw | rs);
+    API_HD44780_HAL_I2C_Write(lcdInstance, nibble | lcdInstance->backLight |  ENsET  | rw | rs);
     API_HD44780_HAL_Delay(DELAY1MS);
-    API_HD44780_HAL_I2C_Write(lcdInstance, nibble | 0x08 | ENuNSET | rw | rs);
+    API_HD44780_HAL_I2C_Write(lcdInstance, nibble | lcdInstance->backLight | ENuNSET | rw | rs);
     API_HD44780_HAL_Delay(DELAY1MS);
   }
 }

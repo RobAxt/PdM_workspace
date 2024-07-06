@@ -90,6 +90,7 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
+  int8_t toogleBackLight = 0;
   API_HD44780_t myLCD;
   myLCD = API_HD44780_Init(0x27, BACKLIGHToN);
   /* USER CODE END 2 */
@@ -101,9 +102,10 @@ int main(void)
     /* USER CODE END WHILE */
     API_HD44780_SetCursor(myLCD, LINE1, 0);
     API_HD44780_SendString(myLCD, (uint8_t*)"HOLA");
-    API_HD44780_SetCursor(myLCD, LINE2, 0);
-    API_HD44780_SendString(myLCD, (uint8_t*)"MUNDO");
-    HAL_Delay(3000);
+    API_HD44780_SetCursor(myLCD, LINE2, 4);
+    API_HD44780_SendString(myLCD, (uint8_t*)"MUNDO !!!");
+    API_HD44780_SetBacklight(myLCD, (toogleBackLight++)%2?BACKLIGHToN:BACKLIGHToFF);
+    HAL_Delay(1000);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
