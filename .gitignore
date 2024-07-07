@@ -1,6 +1,7 @@
 .metadata/
 */Binaries/
 */Debug/
+*.launch
 
 # Prerequisites
 *.d

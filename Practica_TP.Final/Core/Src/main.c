@@ -112,7 +112,8 @@ int main(void)
     API_HD44780_SendString(myLCD, (uint8_t*)"MUNDO !!!");
     API_HD44780_SetBacklight(myLCD, (toogleBackLight++)%2?BACKLIGHToN:BACKLIGHToFF);
     HAL_Delay(1000);
-    HAL_UART_Transmit(&huart3,"HOLA MUNDO!!!\r\n",15,5000);
+    //HAL_UART_Transmit(&huart3,"HOLA MUNDO!!!\r\n",15,5000);
+    printf("HOLA MUNDO %02X\r\n", toogleBackLight);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -350,7 +351,14 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+PUTCHAR_PROTOTYPE
+{
+  /* Place your implementation of fputc here */
+  /* e.g. write a character to the USART1 and Loop until the end of transmission */
+  HAL_UART_Transmit(&huart3, (uint8_t *)&ch, 1, 0xFFFF);
 
+  return ch;
+}
 /* USER CODE END 4 */
 
 /**
