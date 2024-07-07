@@ -1,25 +1,25 @@
 /*
- * API_HD44780_HAL.c
+ * API_PN532_HAL.c
  *
- *  Created on: Jul 5, 2024
+ *  Created on: Jul 6, 2024
  *      Author: raxt
  */
 
 /* Includes ------------------------------------------------------------------*/
 
-#include "API_HD44780_HAL.h"
+#include "API_PN532_HAL.h"
 
 /*----------------------------------------------------------------------------*/
 
 /* Extern public variables----------------------------------------------------*/
 
-extern I2C_HandleTypeDef hi2c1;
+extern I2C_HandleTypeDef hi2c2;
 
 /*----------------------------------------------------------------------------*/
 
 /* Private define ------------------------------------------------------------*/
 
-#define TIMEOUT 100
+#define TIMEOUT 500
 
 /*----------------------------------------------------------------------------*/
 
@@ -30,20 +30,22 @@ extern I2C_HandleTypeDef hi2c1;
   * @param  delay: ...
   * @retval None.
   */
-void API_HD44780_HAL_Delay(uint32_t delay)
+void API_PN532_HAL_Delay(uint32_t delay)
 {
   HAL_Delay(delay);
 }
 
 /**
   * @brief  ...
-  * @param  lcdInstance: pointer to the LCD instance structure.
+  * @param  address: ...
   * @param  payload: ...
   * @retval None.
   */
-void API_HD44780_HAL_I2C_Write(API_HD44780_t lcdInstance, uint8_t payload)
+void API_PN532_HAL_I2C_QueryResponse(uint8_t address, uint8_t *query,uint8_t querySize, uint8_t *response, uint8_t responseSize)
 {
-  HAL_I2C_Master_Transmit(&hi2c1, API_HD44780_GetAddress(lcdInstance)<<1, &payload, sizeof(payload), TIMEOUT);
+  if(HAL_I2C_Master_Transmit(&hi2c2, address<<1, query, querySize, TIMEOUT) == HAL_OK ){
+    HAL_I2C_Master_Receive(&hi2c2, address<<1, response, responseSize, TIMEOUT);
+  }
 }
 
 /*----------------------------------------------------------------------------*/
