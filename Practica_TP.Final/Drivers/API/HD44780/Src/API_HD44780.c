@@ -63,9 +63,9 @@ struct API_HD44780_s
 
 /* Private function prototypes -----------------------------------------------*/
 
-void API_HD44780_Write_DataNibble(API_HD44780_t lcdInstance, uint8_t nibble, uint8_t rs, uint8_t rw);
-void API_HD44780_Write_Data(API_HD44780_t lcdInstance, uint8_t nibble, uint8_t rs, uint8_t rw);
-void API_HD44780_InitLCD(API_HD44780_t lcdInstance);
+static void API_HD44780_Write_DataNibble(API_HD44780_t lcdInstance, uint8_t nibble, uint8_t rs, uint8_t rw);
+static void API_HD44780_Write_Data(API_HD44780_t lcdInstance, uint8_t nibble, uint8_t rs, uint8_t rw);
+static void API_HD44780_InitLCD(API_HD44780_t lcdInstance);
 
 /*----------------------------------------------------------------------------*/
 
@@ -144,7 +144,7 @@ API_HD44780_t API_HD44780_Init(uint8_t address, backlight_t backLight)
   * @param  lcdInstance: pointer to the LCD instance structure.
   * @retval None.
   */
-void API_HD44780_InitLCD(API_HD44780_t lcdInstance)
+static void API_HD44780_InitLCD(API_HD44780_t lcdInstance)
 {
   const uint8_t initCommands[] = {
 		                           NIBBLEmODE, DISPLAYmODE|DMdISPLAYoFF|DMcURSORoFF,
@@ -225,7 +225,7 @@ void API_HD44780_SetCursor(API_HD44780_t lcdInstance, uint8_t line, uint8_t offs
   * @param  rw: perform read or write operation.
   * @retval None.
   */
-void API_HD44780_Write_Data(API_HD44780_t lcdInstance, uint8_t payload, uint8_t rs, uint8_t rw)
+static void API_HD44780_Write_Data(API_HD44780_t lcdInstance, uint8_t payload, uint8_t rs, uint8_t rw)
 {
   if(NULL != lcdInstance && (RScMD == rs || RSdATA == rs) && (RWwRITE == rw || RWrEAD == rw))
   {
@@ -242,7 +242,7 @@ void API_HD44780_Write_Data(API_HD44780_t lcdInstance, uint8_t payload, uint8_t 
   * @param  rw: perform read or write operation.
   * @retval None.
   */
-void API_HD44780_Write_DataNibble(API_HD44780_t lcdInstance, uint8_t nibble, uint8_t rs, uint8_t rw)
+static void API_HD44780_Write_DataNibble(API_HD44780_t lcdInstance, uint8_t nibble, uint8_t rs, uint8_t rw)
 {
   if(NULL != lcdInstance && (RScMD == rs || RSdATA == rs) && (RWwRITE == rw || RWrEAD == rw))
   {
