@@ -13,7 +13,7 @@
 
 /* Extern public variables----------------------------------------------------*/
 
-extern I2C_HandleTypeDef hi2c2;
+extern I2C_HandleTypeDef hi2c1;
 
 /*----------------------------------------------------------------------------*/
 
@@ -37,15 +37,27 @@ void API_PN532_HAL_Delay(uint32_t delay)
 
 /**
   * @brief  ...
-  * @param  address: ...
+  * @param  lcdInstance: pointer to the LCD instance structure.
   * @param  payload: ...
   * @retval None.
   */
-void API_PN532_HAL_I2C_QueryResponse(uint8_t address, uint8_t *query,uint8_t querySize, uint8_t *response, uint8_t responseSize)
+bool API_PN532_HAL_I2C_Write(uint8_t address, uint8_t *query, uint16_t querySize)
 {
-  if(HAL_I2C_Master_Transmit(&hi2c2, address<<1, query, querySize, TIMEOUT) == HAL_OK ){
-    HAL_I2C_Master_Receive(&hi2c2, address<<1, response, responseSize, TIMEOUT);
-  }
+  if(HAL_I2C_Master_Transmit(&hi2c1, address<<1, query, querySize, TIMEOUT)==HAL_OK)
+    return true;
+  else
+	return false;
 }
+
+
+
+bool API_PN532_HAL_I2C_Read(uint8_t address, uint8_t *response, uint16_t responseSize)
+{
+  if(HAL_I2C_Master_Receive(&hi2c1, address<<1, response, responseSize, TIMEOUT)==HAL_OK)
+    return true;
+  else
+	return false;
+}
+
 
 /*----------------------------------------------------------------------------*/

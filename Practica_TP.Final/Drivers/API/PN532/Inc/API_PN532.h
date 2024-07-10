@@ -11,6 +11,7 @@
 /* Includes ------------------------------------------------------------------*/
 
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
 
 /*----------------------------------------------------------------------------*/
@@ -19,6 +20,7 @@
 
 #define APIpN532eRROR 0x80
 #define MAXUIDsIZE 		10 	// More Info @ --> https://www.nfc-tag-shop.de/info/en/knowledge/uid-uniquely-identify-and-clone-nfc-tags/
+#define PN532aDDRESS  0x24
 
 /*----------------------------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/

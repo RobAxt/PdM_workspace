@@ -11,6 +11,7 @@
 /* Includes ------------------------------------------------------------------*/
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "stm32f4xx_hal.h"
 #include "API_PN532.h"
 
@@ -30,7 +31,10 @@
 /* Exported functions prototypes ---------------------------------------------*/
 
 void API_PN532_HAL_Delay(uint32_t delay);
-void API_PN532_HAL_I2C_QueryResponse(uint8_t address, uint8_t *query,uint8_t querySize, uint8_t *response, uint8_t responseSize);
+bool API_PN532_HAL_I2C_Write(uint8_t address, uint8_t *query, uint16_t querySize);
+bool API_PN532_HAL_I2C_Read(uint8_t address, uint8_t *response, uint16_t responseSize);
+void API_PN532_HAL_I2C_QueryResponse(uint8_t address, uint8_t *query, uint16_t querySize, uint8_t *response, uint16_t responseSize);
+
 /*----------------------------------------------------------------------------*/
 
 #endif /* API_PN532_INC_API_PN532_HAL_H_ */

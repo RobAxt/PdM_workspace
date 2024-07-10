@@ -13,7 +13,7 @@
 
 /* Extern public variables----------------------------------------------------*/
 
-extern I2C_HandleTypeDef hi2c1;
+extern I2C_HandleTypeDef hi2c2;
 
 /*----------------------------------------------------------------------------*/
 
@@ -43,7 +43,7 @@ void API_HD44780_HAL_Delay(uint32_t delay)
   */
 void API_HD44780_HAL_I2C_Write(API_HD44780_t lcdInstance, uint8_t payload)
 {
-  HAL_I2C_Master_Transmit(&hi2c1, API_HD44780_GetAddress(lcdInstance)<<1, &payload, sizeof(payload), TIMEOUT);
+  HAL_I2C_Master_Transmit(&hi2c2, API_HD44780_GetAddress(lcdInstance)<<1, &payload, sizeof(payload), TIMEOUT);
 }
 
 /*----------------------------------------------------------------------------*/

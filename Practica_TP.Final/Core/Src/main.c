@@ -98,8 +98,10 @@ int main(void)
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
   int8_t toogleBackLight = 0;
-  API_HD44780_t myLCD;
+  API_HD44780_t myLCD = NULL;
   myLCD = API_HD44780_Init(0x27, BACKLIGHToN);
+  tag_t tag = NULL;
+  API_PN532_Init(tag);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -113,7 +115,9 @@ int main(void)
     API_HD44780_SetBacklight(myLCD, (toogleBackLight++)%2?BACKLIGHToN:BACKLIGHToFF);
     HAL_Delay(1000);
     //HAL_UART_Transmit(&huart3,"HOLA MUNDO!!!\r\n",15,5000);
-    printf("HOLA MUNDO %02X\r\n", toogleBackLight);
+    //printf("HOLA MUNDO %02X\r\n", toogleBackLight);
+    //API_PN532_ReadTag(tag);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
