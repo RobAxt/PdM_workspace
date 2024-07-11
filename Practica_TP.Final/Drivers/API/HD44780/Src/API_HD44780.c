@@ -78,7 +78,9 @@ static void API_HD44780_InitLCD(API_HD44780_t lcdInstance);
   */
 uint8_t API_HD44780_GetAddress(API_HD44780_t lcdInstance)
 {
-  return lcdInstance->address;
+  if(NULL != lcdInstance)
+    return lcdInstance->address;
+  return NOaDDRESS;
 }
 
 /**
@@ -90,10 +92,13 @@ uint8_t API_HD44780_GetAddress(API_HD44780_t lcdInstance)
 
 void API_HD44780_SetAddress(API_HD44780_t lcdInstance, uint8_t address)
 {
-  if(PCF8574MAXaDDRESS >= address && PCF8574MINaDDRESS <= address)
-    lcdInstance->address = address;
-  else
-    lcdInstance->address = PCF8574MAXaDDRESS;
+  if(NULL != lcdInstance)
+  {
+    if(PCF8574MAXaDDRESS >= address && PCF8574MINaDDRESS <= address)
+      lcdInstance->address = address;
+    else
+      lcdInstance->address = PCF8574MAXaDDRESS;
+  }
 }
 
 /**
@@ -103,7 +108,9 @@ void API_HD44780_SetAddress(API_HD44780_t lcdInstance, uint8_t address)
   */
 backlight_t API_HD44780_GetBacklight(API_HD44780_t lcdInstance)
 {
-  return lcdInstance->backLight;
+  if(NULL != lcdInstance)
+    return lcdInstance->backLight;
+  return BACKLIGHToFF;
 }
 
 /**
@@ -115,10 +122,13 @@ backlight_t API_HD44780_GetBacklight(API_HD44780_t lcdInstance)
 
 void API_HD44780_SetBacklight(API_HD44780_t lcdInstance, backlight_t backLight)
 {
-  if(BACKLIGHToN == backLight || BACKLIGHToFF == backLight)
-    lcdInstance->backLight = backLight;
-  else
-	  lcdInstance->backLight = BACKLIGHToN;
+  if(NULL != lcdInstance)
+  {
+    if(BACKLIGHToN == backLight || BACKLIGHToFF == backLight)
+      lcdInstance->backLight = backLight;
+    else
+      lcdInstance->backLight = BACKLIGHToN;
+  }
 }
 
 /**
@@ -153,16 +163,19 @@ static void API_HD44780_InitLCD(API_HD44780_t lcdInstance)
                                  };
   const uint8_t MAXcOMMANDS = sizeof(initCommands)/sizeof(initCommands[0]);
 
-  API_HD44780_HAL_Delay(DELAY20MS);
-  API_HD44780_Write_DataNibble(lcdInstance, INITcMD1, RScMD, RWwRITE);
-  API_HD44780_HAL_Delay(DELAY10MS);
-  API_HD44780_Write_DataNibble(lcdInstance, INITcMD1, RScMD, RWwRITE);
-  API_HD44780_HAL_Delay(DELAY1MS);
-  API_HD44780_Write_DataNibble(lcdInstance, INITcMD1, RScMD, RWwRITE);
-  API_HD44780_Write_DataNibble(lcdInstance, INITcMD2, RScMD, RWwRITE);
+  if(NULL != lcdInstance)
+  {
+    API_HD44780_HAL_Delay(DELAY20MS);
+    API_HD44780_Write_DataNibble(lcdInstance, INITcMD1, RScMD, RWwRITE);
+    API_HD44780_HAL_Delay(DELAY10MS);
+    API_HD44780_Write_DataNibble(lcdInstance, INITcMD1, RScMD, RWwRITE);
+    API_HD44780_HAL_Delay(DELAY1MS);
+    API_HD44780_Write_DataNibble(lcdInstance, INITcMD1, RScMD, RWwRITE);
+    API_HD44780_Write_DataNibble(lcdInstance, INITcMD2, RScMD, RWwRITE);
 
-  for(uint8_t i=0; i<MAXcOMMANDS; i++)
-    API_HD44780_Write_Data(lcdInstance, initCommands[i], RScMD, RWwRITE);
+    for(uint8_t i=0; i<MAXcOMMANDS; i++)
+      API_HD44780_Write_Data(lcdInstance, initCommands[i], RScMD, RWwRITE);
+  }
 }
 
 /**
@@ -172,8 +185,11 @@ static void API_HD44780_InitLCD(API_HD44780_t lcdInstance)
   */
 void API_HD44780_ClearDisplay(API_HD44780_t lcdInstance)
 {
-  API_HD44780_Write_Data(lcdInstance, CLEARdISPLAY, RScMD, RWwRITE);
-  API_HD44780_HAL_Delay(DELAY2MS);
+  if(NULL != lcdInstance)
+  {
+    API_HD44780_Write_Data(lcdInstance, CLEARdISPLAY, RScMD, RWwRITE);
+    API_HD44780_HAL_Delay(DELAY2MS);
+  }
 }
 
 /**
@@ -184,7 +200,7 @@ void API_HD44780_ClearDisplay(API_HD44780_t lcdInstance)
   */
 void API_HD44780_SendChar(API_HD44780_t lcdInstance, uint8_t ascii)
 {
-  if(VALIDmINaSCII <= ascii || VALIDmAXaSCII >= ascii)
+  if(NULL != lcdInstance && (VALIDmINaSCII <= ascii || VALIDmAXaSCII >= ascii))
     API_HD44780_Write_Data(lcdInstance, ascii, RSdATA, RWwRITE);
 }
 
@@ -196,8 +212,9 @@ void API_HD44780_SendChar(API_HD44780_t lcdInstance, uint8_t ascii)
   */
 void API_HD44780_SendString(API_HD44780_t lcdInstance, uint8_t *string)
 {
-  while(NULL != string && EOL != *string)
-    API_HD44780_SendChar(lcdInstance, *(string++));
+  if(NULL != lcdInstance)
+    while(NULL != string && EOL != *string)
+      API_HD44780_SendChar(lcdInstance, *(string++));
 }
 
 /**
@@ -209,7 +226,7 @@ void API_HD44780_SendString(API_HD44780_t lcdInstance, uint8_t *string)
   */
 void API_HD44780_SetCursor(API_HD44780_t lcdInstance, uint8_t line, uint8_t offset)
 {
-  if((LINE1 == line || LINE2 == line) && DISPLAYlINEsIZE > offset)
+  if(NULL != lcdInstance && (LINE1 == line || LINE2 == line) && DISPLAYlINEsIZE > offset)
     API_HD44780_Write_Data(lcdInstance, SETDDRAM | ((LINE2 == line?LINE2aDDRESS:LINE1aDDRESS) + offset), RScMD, RWwRITE);
 }
 
