@@ -100,8 +100,9 @@ int main(void)
   int8_t toogleBackLight = 0;
   API_HD44780_t myLCD = NULL;
   myLCD = API_HD44780_Init(0x27, BACKLIGHToN);
-  tag_t tag = NULL;
-  API_PN532_Init(tag);
+
+  PN532_t myTagReader = NULL;
+  myTagReader = API_PN532_Init();
   /* USER CODE END 2 */
 
   /* Infinite loop */

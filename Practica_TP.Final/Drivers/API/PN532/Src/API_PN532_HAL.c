@@ -41,7 +41,7 @@ void API_PN532_HAL_Delay(uint32_t delay)
   * @param  payload: ...
   * @retval None.
   */
-bool API_PN532_HAL_I2C_Write(uint8_t address, uint8_t *query, uint16_t querySize)
+bool_t API_PN532_HAL_I2C_Write(uint8_t address, uint8_t *query, uint16_t querySize)
 {
   if(HAL_I2C_Master_Transmit(&hi2c1, address<<1, query, querySize, TIMEOUT)==HAL_OK)
     return true;
@@ -51,7 +51,7 @@ bool API_PN532_HAL_I2C_Write(uint8_t address, uint8_t *query, uint16_t querySize
 
 
 
-bool API_PN532_HAL_I2C_Read(uint8_t address, uint8_t *response, uint16_t responseSize)
+bool_t API_PN532_HAL_I2C_Read(uint8_t address, uint8_t *response, uint16_t responseSize)
 {
   if(HAL_I2C_Master_Receive(&hi2c1, address<<1, response, responseSize, TIMEOUT)==HAL_OK)
     return true;

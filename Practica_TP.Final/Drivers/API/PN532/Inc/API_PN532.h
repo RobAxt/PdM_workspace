@@ -18,23 +18,36 @@
 
 /* Exported constants --------------------------------------------------------*/
 
-#define APIpN532eRROR 0x80
 #define MAXUIDsIZE 		10 	// More Info @ --> https://www.nfc-tag-shop.de/info/en/knowledge/uid-uniquely-identify-and-clone-nfc-tags/
 #define PN532aDDRESS  0x24
 
 /*----------------------------------------------------------------------------*/
+
 /* Exported types ------------------------------------------------------------*/
 
-typedef struct tag_s * tag_t;
+typedef struct PN532_s * PN532_t;
+
+typedef enum {
+  PN532oK = 0,
+  PN532bADaCK,
+  PN532nOaCK,
+  PN532bADcOMMAND,
+  PN532bADrESPONSE,
+  PN532nOtAG
+} PN532_Error_t;
 
 /*----------------------------------------------------------------------------*/
 
 /* Exported functions prototypes ---------------------------------------------*/
 
-void   API_PN532_Init(tag_t tag);
-int8_t API_PN532_ReadTag(tag_t tag);
-int8_t API_PN532_GetTag(tag_t tag, uint8_t *UID, const uint8_t size);
-void   API_PN532_SetTag(tag_t tag, const uint8_t * const UID, const uint8_t size);
+PN532_t       API_PN532_Init();
+PN532_Error_t API_PN532_ReadTag(PN532_t instance);
+
+uint8_t API_PN532_GetTag(PN532_t instance, uint8_t *uid, const uint8_t size);
+uint8_t API_PN532_GetIC(PN532_t instance);
+uint8_t API_PN532_GetVersion(PN532_t instance);
+uint8_t API_PN532_GetRevision(PN532_t instance);
+uint8_t API_PN532_GetSupport(PN532_t instance);
 
 /*----------------------------------------------------------------------------*/
 
