@@ -109,6 +109,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	API_PN532_ReadTag(myTagReader);
+
     API_HD44780_SetCursor(myLCD, LINE1, 0);
     API_HD44780_SendString(myLCD, (uint8_t*)"HOLA");
     API_HD44780_SetCursor(myLCD, LINE2, 4);

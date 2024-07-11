@@ -3,6 +3,7 @@
  *
  *  Created on: Jul 6, 2024
  *      Author: raxt
+ *       TODO:  Optimize interrogation sequence in a generic private function.
  */
 
 #ifndef API_PN532_INC_API_PN532_H_

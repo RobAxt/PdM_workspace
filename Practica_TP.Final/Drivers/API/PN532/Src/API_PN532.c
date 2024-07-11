@@ -14,12 +14,16 @@
 
 /* Private define ------------------------------------------------------------*/
 
+static const uint8_t PREAMBLEsTART[]       = {0x00, 0x00, 0xFF};
 static const uint8_t ACKNOLEDGE[]          = {0x00, 0x00, 0xFF, 0x00, 0xFF, 0x00};
 static const uint8_t FIRMWARE[]            = {0x00, 0x00, 0xFF, 0x02, 0xFE, 0xD4, 0x02, 0x2A, 0x00};
+static const uint8_t SAMCONFIG[]           = {0x00, 0x00, 0xFF, 0x03, 0xFD, 0xD4, 0x14, 0x01, 0x17, 0x00};
 static const uint8_t INlISTpASSIVEtARGET[] = {0x00, 0x00, 0xFF, 0x04, 0XFC, 0XD4, 0x4A, 0x01, 0x00, 0xE1, 0x00};
 
-#define MAXrESPONSEsIZE 64
+#define MAXrESPONSEsIZE 32
+#define NOtAGpRESENT   128
 #define ACKsIZE          6
+#define ZERO             0
 
 /*----------------------------------------------------------------------------*/
 
@@ -48,11 +52,12 @@ struct PN532_s
 
 typedef struct
 {
-  uint8_t preamble[2]; //PreAmble
+  uint8_t preamble;    //PreAmble
+  uint8_t start[2];    //Start of Packet Code
   uint8_t len;         //Length
-  uint8_t lcs;          //Length CheckSum
+  uint8_t lcs;         //Length CheckSum
   uint8_t tfi;         //Frame Identifier
-  uint8_t pd0;         //0x03
+  uint8_t cmd;         //0x03
   uint8_t ic;          //0x32
   uint8_t version;     //0x01
   uint8_t revision;    //0x06
@@ -63,11 +68,22 @@ typedef struct
 
 typedef struct
 {
-  uint8_t preamble[2]; //PreAmble
+  uint8_t preamble;    //PreAmble
+  uint8_t start[2];    //Start of Packet Code
   uint8_t len;         //Length
   uint8_t lcs;         //Length CheckSum
   uint8_t tfi;         //Frame Identifier
-
+  uint8_t cmd;         //0x4B
+  uint8_t nbtg;        //Number of Tag Readed
+  uint8_t index;       //Tag index
+  uint8_t pd3;
+  uint8_t pd4;
+  uint8_t pd5;
+  uint8_t size;         //Tag size
+  uint8_t tag0;
+  uint8_t tag1;
+  uint8_t tag2;
+  uint8_t tag3;
   uint8_t dcs;         //Data CheckSum
   uint8_t postamble;   //PostAmble
 } PN532_Tag_Response_t;
@@ -157,16 +173,35 @@ PN532_t API_PN532_Init()
       API_PN532_HAL_Delay(10);
       if(PN532oK == API_PN532_ReceiveResponse((uint8_t *)response, sizeof(response)))
       {
-		memcpy(&tmp, &response[1], sizeof(PN532_Firmware_Response_t));
+        uint8_t offset=0;
+        while(memcmp(&response[offset], PREAMBLEsTART, sizeof(PREAMBLEsTART)) && offset < (sizeof(PN532_Firmware_Response_t)-sizeof(PREAMBLEsTART)))
+          offset++;
+
+        memcpy(&tmp, &response[offset], sizeof(PN532_Firmware_Response_t));
 		
 		this.firmware.ic       = tmp.ic;
 		this.firmware.version  = tmp.version;
 		this.firmware.revision = tmp.revision;
         this.firmware.support  = tmp.support;
-		
 	  }
     }
   }
+
+  memset(response, ZERO, sizeof(response));
+
+  if(PN532oK == API_PN532_SendCommand((uint8_t *)SAMCONFIG, sizeof(SAMCONFIG)))
+  {
+    API_PN532_HAL_Delay(10);
+    if(PN532oK == API_PN532_ReceiveAck())
+    {
+      API_PN532_HAL_Delay(10);
+      if(PN532oK == API_PN532_ReceiveResponse((uint8_t *)response, sizeof(response)))
+      {
+		// Do Nothing...
+	  }
+    }
+  }
+
   return &this;
 }
 
@@ -179,6 +214,7 @@ PN532_Error_t API_PN532_ReadTag(PN532_t instance)
 {
   uint8_t response[MAXrESPONSEsIZE] = {0};
   PN532_Tag_Response_t tmp = {0};
+  PN532_Error_t result = PN532oK;
 
   if(PN532oK == API_PN532_SendCommand((uint8_t *)INlISTpASSIVEtARGET, sizeof(INlISTpASSIVEtARGET)))
   {
@@ -188,14 +224,43 @@ PN532_Error_t API_PN532_ReadTag(PN532_t instance)
       API_PN532_HAL_Delay(10);
       if(PN532oK == API_PN532_ReceiveResponse((uint8_t *)response, sizeof(response)))
       {
-		memcpy(&tmp, &response[1], sizeof(PN532_Tag_Response_t));
+        if(NOtAGpRESENT != response[1])
+        {
+          uint8_t offset=0;
+          while(memcmp(&response[offset], PREAMBLEsTART, sizeof(PREAMBLEsTART)) && offset < (sizeof(PN532_Tag_Response_t)-sizeof(PREAMBLEsTART)))
+            offset++;
 
-       //TODO: Copy response array to instance->tag.uid and size structure
+		  memcpy(&tmp, &response[offset], sizeof(PN532_Tag_Response_t));
+          //TODO: generic tag uid size...
+          instance->tag.size = tmp.size;
+          instance->tag.uid[0] =  tmp.tag0;
+          instance->tag.uid[1] =  tmp.tag1;
+          instance->tag.uid[2] =  tmp.tag2;
+          instance->tag.uid[3] =  tmp.tag3;
 
-	  }
+          result = PN532oK;
+        }
+        else
+        {
+          memset(&instance->tag, ZERO, sizeof(instance->tag));
+          result = PN532nOtAG;
+        }
+      }
+      else
+      {
+        result = PN532bADrESPONSE;
+      }
+    }
+    else
+    {
+      result = PN532bADaCK;
     }
   }
-  return PN532oK;
+  else
+  {
+    result = PN532bADcOMMAND;
+  }
+  return result;
 }
 
 /*----------------------------------------------------------------------------*/
@@ -219,14 +284,18 @@ static PN532_Error_t API_PN532_SendCommand(uint8_t *command, const uint8_t size)
   */
 static PN532_Error_t API_PN532_ReceiveAck(void)
 {
-  uint8_t acknowledge[ACKsIZE] = {0};
+  uint8_t acknowledge[ACKsIZE+1] = {0};
   
   if(!API_PN532_HAL_I2C_Read(PN532aDDRESS, acknowledge, ACKsIZE))
   {
     return PN532bADrESPONSE;
   }
-  
-  if(!memcmp(acknowledge, ACKNOLEDGE, sizeof(ACKNOLEDGE)))
+
+  uint8_t offset=0;
+  while(memcmp(&acknowledge[offset], PREAMBLEsTART, sizeof(PREAMBLEsTART)) && offset < (sizeof(ACKNOLEDGE)-sizeof(PREAMBLEsTART)))
+    offset++;
+
+  if(memcmp(&acknowledge[offset], ACKNOLEDGE, sizeof(ACKNOLEDGE)))
   {
     return PN532bADaCK;
   }
