@@ -107,10 +107,13 @@ static PN532_Error_t API_PN532_ReceiveResponse(uint8_t *response, uint8_t size);
   */
 uint8_t API_PN532_GetTag(PN532_t instance, uint8_t *uid, const uint8_t size)
 {
-  if(size >= instance->tag.size)
-	memcpy(uid, &instance->tag.uid, instance->tag.size);
-
-  return instance->tag.size;
+  if(NULL != instance)
+  {
+    if(size >= instance->tag.size)
+      memcpy(uid, &instance->tag.uid, instance->tag.size);
+    return instance->tag.size;
+  }
+  return NOTiNITIALIZED;
 }
 
 /**
@@ -120,7 +123,11 @@ uint8_t API_PN532_GetTag(PN532_t instance, uint8_t *uid, const uint8_t size)
   */
 uint8_t API_PN532_GetIC(PN532_t instance)
 {
-  return instance->firmware.ic;
+  if(NULL != instance)
+  {
+    return instance->firmware.ic;
+  }
+  return NOTiNITIALIZED;
 }
 
 /**
@@ -130,7 +137,11 @@ uint8_t API_PN532_GetIC(PN532_t instance)
   */
 uint8_t API_PN532_GetVersion(PN532_t instance)
 {
-  return instance->firmware.version;
+  if(NULL != instance)
+  {
+    return instance->firmware.version;
+  }
+  return NOTiNITIALIZED;
 }
 
 /**
@@ -140,7 +151,11 @@ uint8_t API_PN532_GetVersion(PN532_t instance)
   */
 uint8_t API_PN532_GetRevision(PN532_t instance)
 {
-  return instance->firmware.revision;
+  if(NULL != instance)
+  {
+    return instance->firmware.revision;
+  }
+  return NOTiNITIALIZED;
 }
 
 /**
@@ -150,7 +165,11 @@ uint8_t API_PN532_GetRevision(PN532_t instance)
   */
 uint8_t API_PN532_GetSupport(PN532_t instance)
 {
-  return instance->firmware.support;
+  if(NULL != instance)
+  {
+    return instance->firmware.support;
+  }
+  return NOTiNITIALIZED;
 }
 
 /**
@@ -214,7 +233,12 @@ PN532_Error_t API_PN532_ReadTag(PN532_t instance)
 {
   uint8_t response[MAXrESPONSEsIZE] = {0};
   PN532_Tag_Response_t tmp = {0};
-  PN532_Error_t result = PN532oK;
+  PN532_Error_t result = PN532nOTiNITIALIZED;
+
+  if(NULL == instance)
+  {
+      return result;
+  }
 
   if(PN532oK == API_PN532_SendCommand((uint8_t *)INlISTpASSIVEtARGET, sizeof(INlISTpASSIVEtARGET)))
   {

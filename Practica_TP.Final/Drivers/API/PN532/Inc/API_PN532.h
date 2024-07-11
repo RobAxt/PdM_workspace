@@ -21,7 +21,7 @@
 
 #define MAXUIDsIZE 		10 	// More Info @ --> https://www.nfc-tag-shop.de/info/en/knowledge/uid-uniquely-identify-and-clone-nfc-tags/
 #define PN532aDDRESS  0x24
-
+#define NOTiNITIALIZED   0
 /*----------------------------------------------------------------------------*/
 
 /* Exported types ------------------------------------------------------------*/
@@ -34,7 +34,8 @@ typedef enum {
   PN532nOaCK,
   PN532bADcOMMAND,
   PN532bADrESPONSE,
-  PN532nOtAG
+  PN532nOtAG,
+  PN532nOTiNITIALIZED
 } PN532_Error_t;
 
 /*----------------------------------------------------------------------------*/
