@@ -31,19 +31,24 @@
 
 /* Private typedef -----------------------------------------------------------*/
 
-typedef enum{
+typedef enum
+{
   BUTTON_UP,
   BUTTON_FALLING,
   BUTTON_DOWN,
   BUTTON_RAISING,
 } debounceState_t;
 
+typedef enum
+{
+  DOWN = 0,
+  UP
+} pushButtonState_t;
+
 /* Private define ------------------------------------------------------------*/
 
 #define REFRESHFSM    10
 #define DEBOUNCEdELAY 40
-#define UP             1
-#define DOWN           0
 
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
@@ -67,6 +72,7 @@ void debounceFSM_update(void);
 
 void buttonPressed(void);
 void buttonReleased(void);
+pushButtonState_t buttonState(void);
 
 /* Private functions ---------------------------------------------------------*/
 
@@ -94,7 +100,6 @@ int main(void)
 
   /* Initialize BSP Led for LED1 */
   BSP_LED_Init(LED1);
-  BSP_LED_On(LED1);
 
   /* Initialize BSP PB for BUTTON_USER */
   BSP_PB_Init(BUTTON_USER, BUTTON_MODE_GPIO);
@@ -112,6 +117,7 @@ int main(void)
 
 void debounceFSM_init()
 {
+  BSP_LED_On(LED1);
   delayInit(&debounceDelay, DEBOUNCEdELAY);
   currentState = BUTTON_UP;
 }
@@ -126,18 +132,23 @@ void buttonReleased(void)
   BSP_LED_Off(LED1);
 }
 
+pushButtonState_t buttonState(void)
+{
+	return BSP_PB_GetState(BUTTON_USER)? UP : DOWN;
+}
+
 void debounceFSM_update(void)
 {
   switch(currentState)
   {
 	case BUTTON_UP:
-		if(DOWN == BSP_PB_GetState(BUTTON_USER))
+		if(DOWN == buttonState())
 			currentState = BUTTON_FALLING;
       break;
 	case BUTTON_FALLING:
 		if(false == delayRead(&debounceDelay))
 		{
-			if(DOWN == BSP_PB_GetState(BUTTON_USER))
+			if(DOWN == buttonState())
 			{
 				currentState = BUTTON_DOWN;
 				buttonPressed();
@@ -147,16 +158,16 @@ void debounceFSM_update(void)
 		}
 	      break;
 	case BUTTON_DOWN:
-		if(UP == BSP_PB_GetState(BUTTON_USER))
+		if(UP == buttonState())
 					currentState = BUTTON_RAISING;
 	      break;
 	case BUTTON_RAISING:
 		if(false == delayRead(&debounceDelay))
 			{
-				if(UP == BSP_PB_GetState(BUTTON_USER))
+				if(UP == buttonState())
 				{
 					currentState = BUTTON_UP;
-					buttonPressed();
+					buttonReleased();
 				}
 				else
 					currentState = BUTTON_DOWN;
