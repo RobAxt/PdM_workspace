@@ -20,7 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "API_delay.h"
+
 /** @addtogroup STM32F4xx_HAL_Examples
   * @{
   */
@@ -31,32 +31,15 @@
 
 /* Private typedef -----------------------------------------------------------*/
 
-typedef enum
-{
-  BUTTON_UP,
-  BUTTON_FALLING,
-  BUTTON_DOWN,
-  BUTTON_RAISING,
-} debounceState_t;
-
-typedef enum
-{
-  DOWN = 0,
-  UP
-} pushButtonState_t;
-
 /* Private define ------------------------------------------------------------*/
 
 #define REFRESHFSM    10
-#define DEBOUNCEdELAY 40
+
 
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 
 delay_t refreshFSM = {0, 0, false};
-delay_t debounceDelay = {0, 0, false};
-
-debounceState_t currentState = BUTTON_UP;
 
 /* UART handler declaration */
 
@@ -66,13 +49,6 @@ UART_HandleTypeDef UartHandle;
 
 static void SystemClock_Config(void);
 static void Error_Handler(void);
-
-void debounceFSM_init(void);
-void debounceFSM_update(void);
-
-void buttonPressed(void);
-void buttonReleased(void);
-pushButtonState_t buttonState(void);
 
 /* Private functions ---------------------------------------------------------*/
 
@@ -100,82 +76,37 @@ int main(void)
 
   /* Initialize BSP Led for LED1 */
   BSP_LED_Init(LED1);
+  BSP_LED_Off(LED1);
+
+  const uint32_t TIEMPOS[] = {500, 100};
+  const uint8_t MAXtIEMPOS = sizeof(TIEMPOS) / sizeof(TIEMPOS[0]);
+  int8_t chooseTiempos = 0;
+
+  delay_t delay = {0,0,false};
 
   /* Initialize BSP PB for BUTTON_USER */
   BSP_PB_Init(BUTTON_USER, BUTTON_MODE_GPIO);
 
-  /**/
+  /* Initialize FSM related function*/
   delayInit(&refreshFSM, REFRESHFSM);
-  debounceFSM_init();
+  API_debounceFSM_init();
 
   while(1)
   {
     if(false == delayRead(&refreshFSM))
-      debounceFSM_update();
-  }
-}
+      API_debounceFSM_update();
 
-void debounceFSM_init()
-{
-  BSP_LED_On(LED1);
-  delayInit(&debounceDelay, DEBOUNCEdELAY);
-  currentState = BUTTON_UP;
-}
+    if(false == delayRead(&delay)) // If time runs out... then toggle LED
+    {
+      BSP_LED_Toggle(LED1);
 
-void buttonPressed(void)
-{
-  BSP_LED_On(LED1);
-}
-
-void buttonReleased(void)
-{
-  BSP_LED_Off(LED1);
-}
-
-pushButtonState_t buttonState(void)
-{
-  return BSP_PB_GetState(BUTTON_USER)? UP : DOWN;
-}
-
-void debounceFSM_update(void)
-{
-  switch(currentState)
-  {
-	case BUTTON_UP:
-		if(DOWN == buttonState())
-			currentState = BUTTON_FALLING;
-      break;
-	case BUTTON_FALLING:
-		if(false == delayRead(&debounceDelay))
-		{
-			if(DOWN == buttonState())
-			{
-				currentState = BUTTON_DOWN;
-				buttonPressed();
-			}
-			else
-				currentState = BUTTON_UP;
-		}
-	      break;
-	case BUTTON_DOWN:
-		if(UP == buttonState())
-					currentState = BUTTON_RAISING;
-	      break;
-	case BUTTON_RAISING:
-		if(false == delayRead(&debounceDelay))
-			{
-				if(UP == buttonState())
-				{
-					currentState = BUTTON_UP;
-					buttonReleased();
-				}
-				else
-					currentState = BUTTON_DOWN;
-			}
-	      break;
-	default:
-		debounceFSM_init();
+      if(API_debounceFSM_readKey())
+      {
+        chooseTiempos = (chooseTiempos + 1) % MAXtIEMPOS;
+        delayWrite(&delay, TIEMPOS[chooseTiempos]);
+      }
     }
+  }
 }
 
 /**
