@@ -133,20 +133,20 @@ int main(void)
       API_HD44780_SendString(myLCD, (uint8_t*)"HOLA            ");
       API_HD44780_SetCursor(myLCD, LINE2, 0);
       API_HD44780_SendString(myLCD, (uint8_t*)"   MUNDO !!!!   ");
-     // API_HD44780_SetBacklight(myLCD, (toogleBackLight++)%2?BACKLIGHToN:BACKLIGHToFF);
 	  }
+
 	  API_Debounce_Update(altaTag);
 	  if(API_Debounce_ReadKey(altaTag))
 	    HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
-    //HAL_Delay(1000);
 
     if(HAL_GPIO_ReadPin(USER_BtnC13_GPIO_Port, USER_BtnC13_Pin))
       HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin,GPIO_PIN_RESET);
     else
       HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin,GPIO_PIN_SET);
+
     //HAL_UART_Transmit(&huart3,"HOLA MUNDO!!!\r\n",15,5000);
     //printf("HOLA MUNDO %02X\r\n", toogleBackLight);
-    //API_PN532_ReadTag(tag);
+
 
     /* USER CODE END WHILE */
 
