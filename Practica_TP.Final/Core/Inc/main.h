@@ -33,6 +33,7 @@ extern "C" {
 /* USER CODE BEGIN Includes */
 #include "API_HD44780.h"
 #include "API_PN532.h"
+#include "API_Debounce.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

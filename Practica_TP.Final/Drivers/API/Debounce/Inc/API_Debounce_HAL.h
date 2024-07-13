@@ -1,17 +1,18 @@
 /*
- * API_Delay.h
+ * API_Debounce_HAL.h
  *
  *  Created on: Jul 13, 2024
  *      Author: raxt
  */
 
-#ifndef API_DELAY_INC_API_DELAY_H_
-#define API_DELAY_INC_API_DELAY_H_
+#ifndef API_DEBOUNCE_INC_API_DEBOUNCE_HAL_H_
+#define API_DEBOUNCE_INC_API_DEBOUNCE_HAL_H_
 
 /* Includes ------------------------------------------------------------------*/
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "stm32f4xx_hal.h"      /* <- HAL include */
 
 /*----------------------------------------------------------------------------*/
 
@@ -22,24 +23,24 @@
 typedef bool bool_t;
 #endif // BOOL_TYPE_DEFINITIOON_
 
-typedef uint32_t tick_t;
+typedef struct
+{
+  GPIO_TypeDef* GPIOx;
+  uint16_t GPIOpin;
+} GPIO_t;
 
-typedef struct Delay_s * Delay_t;
-
-/*----------------------------------------------------------------------------*/
-
-/* Exported constants --------------------------------------------------------*/
-
-#define MAXdELAY          60000
-#define MAXdELAYiNTANCES     10
+typedef enum
+{
+  DOWN = 0,
+  UP
+} pushButtonState_t;
 
 /*----------------------------------------------------------------------------*/
 
 /* Exported functions ------------------------------------------------------- */
 
-Delay_t API_Delay_Init(tick_t duration);
-bool_t  API_Delay_DelayTimeOut(Delay_t delay);
-void    API_Delay_DelayDuration(Delay_t delay, tick_t duration);
+bool_t API_Debounce_HAL_ReadButtonState(GPIO_t pin);
 
 /*----------------------------------------------------------------------------*/
-#endif /* API_DELAY_INC_API_DELAY_H_ */
+
+#endif /* API_DEBOUNCE_INC_API_DEBOUNCE_HAL_H_ */

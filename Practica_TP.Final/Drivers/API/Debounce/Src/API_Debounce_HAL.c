@@ -1,5 +1,5 @@
 /*
- * API_Delay_HAL.c
+ * API_Debounce_HAL.c
  *
  *  Created on: Jul 13, 2024
  *      Author: raxt
@@ -7,7 +7,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 
-#include "API_Delay_HAL.h"
+#include "API_Debounce_HAL.h"
 
 /*----------------------------------------------------------------------------*/
 
@@ -18,9 +18,9 @@
   * @param  ...
   * @retval ...
   */
-tick_t API_Delay_HAL_GetTick(void)
+bool_t API_Debounce_HAL_ReadButtonState(GPIO_t pin)
 {
-  return HAL_GetTick();
+  return HAL_GPIO_ReadPin(pin.GPIOx, pin.GPIOpin) ? true : false;
 }
 
 /*----------------------------------------------------------------------------*/

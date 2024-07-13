@@ -198,9 +198,9 @@ PN532_t API_PN532_Init()
 
         memcpy(&tmp, &response[offset], sizeof(PN532_Firmware_Response_t));
 		
-		this.firmware.ic       = tmp.ic;
-		this.firmware.version  = tmp.version;
-		this.firmware.revision = tmp.revision;
+		    this.firmware.ic       = tmp.ic;
+		    this.firmware.version  = tmp.version;
+		    this.firmware.revision = tmp.revision;
         this.firmware.support  = tmp.support;
 	  }
     }
@@ -254,8 +254,9 @@ PN532_Error_t API_PN532_ReadTag(PN532_t instance)
           while(memcmp(&response[offset], PREAMBLEsTART, sizeof(PREAMBLEsTART)) && offset < (sizeof(PN532_Tag_Response_t)-sizeof(PREAMBLEsTART)))
             offset++;
 
-		  memcpy(&tmp, &response[offset], sizeof(PN532_Tag_Response_t));
-          //TODO: generic tag uid size...
+		      memcpy(&tmp, &response[offset], sizeof(PN532_Tag_Response_t));
+
+		      //TODO: generic tag uid size...
           instance->tag.size = tmp.size;
           instance->tag.uid[0] =  tmp.tag0;
           instance->tag.uid[1] =  tmp.tag1;

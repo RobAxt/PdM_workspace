@@ -106,32 +106,44 @@ int main(void)
   uint8_t myTag[4] = {0};
   PN532_t myTagReader = NULL;
   myTagReader = API_PN532_Init();
+
+  GPIO_t userButton = {USER_BtnC13_GPIO_Port, USER_BtnC13_Pin};
+  DebounceGPI_t altaTag = NULL;
+  altaTag = API_Debounce_Init(userButton);
+  HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, GPIO_PIN_RESET);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	if(PN532oK == API_PN532_ReadTag(myTagReader))
-	{
-	  API_PN532_GetTag(myTagReader, myTag, 4);
-	  API_HD44780_SetBacklight(myLCD,BACKLIGHToN);
-	  API_HD44780_SetCursor(myLCD, LINE1, 0);
-	  API_HD44780_SendString(myLCD, (uint8_t*)"Tag Detected:   ");
-	  API_HD44780_SetCursor(myLCD, LINE2, 0);
-	  sprintf((char*)line, "%02X %02X %02X %02X    ", myTag[0], myTag[1], myTag[2], myTag[3]);
-	  API_HD44780_SendString(myLCD, (uint8_t*)line);
-	}
-	else
-	{
-	  API_HD44780_SetCursor(myLCD, LINE1, 0);
+	  if(PN532oK == API_PN532_ReadTag(myTagReader))
+  	{
+	    API_PN532_GetTag(myTagReader, myTag, 4);
+	    API_HD44780_SetBacklight(myLCD,BACKLIGHToN);
+  	  API_HD44780_SetCursor(myLCD, LINE1, 0);
+      API_HD44780_SendString(myLCD, (uint8_t*)"Tag Detected:   ");
+      API_HD44780_SetCursor(myLCD, LINE2, 0);
+      sprintf((char*)line, "%02X %02X %02X %02X    ", myTag[0], myTag[1], myTag[2], myTag[3]);
+      API_HD44780_SendString(myLCD, (uint8_t*)line);
+	  }
+	  else
+	  {
+      API_HD44780_SetCursor(myLCD, LINE1, 0);
       API_HD44780_SendString(myLCD, (uint8_t*)"HOLA            ");
       API_HD44780_SetCursor(myLCD, LINE2, 0);
       API_HD44780_SendString(myLCD, (uint8_t*)"   MUNDO !!!!   ");
-      API_HD44780_SetBacklight(myLCD, (toogleBackLight++)%2?BACKLIGHToN:BACKLIGHToFF);
-	}
+     // API_HD44780_SetBacklight(myLCD, (toogleBackLight++)%2?BACKLIGHToN:BACKLIGHToFF);
+	  }
+	  API_Debounce_Update(altaTag);
+	  if(API_Debounce_ReadKey(altaTag))
+	    HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
+    //HAL_Delay(1000);
 
-    HAL_Delay(1000);
+    if(HAL_GPIO_ReadPin(USER_BtnC13_GPIO_Port, USER_BtnC13_Pin))
+      HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin,GPIO_PIN_RESET);
+    else
+      HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin,GPIO_PIN_SET);
     //HAL_UART_Transmit(&huart3,"HOLA MUNDO!!!\r\n",15,5000);
     //printf("HOLA MUNDO %02X\r\n", toogleBackLight);
     //API_PN532_ReadTag(tag);
