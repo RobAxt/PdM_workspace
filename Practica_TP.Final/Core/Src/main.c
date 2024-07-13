@@ -98,10 +98,12 @@ int main(void)
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
   int8_t toogleBackLight = 0;
+  int8_t line[DISPLAYlINEsIZE];
 
   API_HD44780_t myLCD = NULL;
   myLCD = API_HD44780_Init(0x27, BACKLIGHToN);
 
+  uint8_t myTag[4] = {0};
   PN532_t myTagReader = NULL;
   myTagReader = API_PN532_Init();
   /* USER CODE END 2 */
@@ -110,13 +112,25 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	API_PN532_ReadTag(myTagReader);
+	if(PN532oK == API_PN532_ReadTag(myTagReader))
+	{
+	  API_PN532_GetTag(myTagReader, myTag, 4);
+	  API_HD44780_SetBacklight(myLCD,BACKLIGHToN);
+	  API_HD44780_SetCursor(myLCD, LINE1, 0);
+	  API_HD44780_SendString(myLCD, (uint8_t*)"Tag Detected:   ");
+	  API_HD44780_SetCursor(myLCD, LINE2, 0);
+	  sprintf((char*)line, "%02X %02X %02X %02X    ", myTag[0], myTag[1], myTag[2], myTag[3]);
+	  API_HD44780_SendString(myLCD, (uint8_t*)line);
+	}
+	else
+	{
+	  API_HD44780_SetCursor(myLCD, LINE1, 0);
+      API_HD44780_SendString(myLCD, (uint8_t*)"HOLA            ");
+      API_HD44780_SetCursor(myLCD, LINE2, 0);
+      API_HD44780_SendString(myLCD, (uint8_t*)"   MUNDO !!!!   ");
+      API_HD44780_SetBacklight(myLCD, (toogleBackLight++)%2?BACKLIGHToN:BACKLIGHToFF);
+	}
 
-    API_HD44780_SetCursor(myLCD, LINE1, 0);
-    API_HD44780_SendString(myLCD, (uint8_t*)"HOLA");
-    API_HD44780_SetCursor(myLCD, LINE2, 4);
-    API_HD44780_SendString(myLCD, (uint8_t*)"MUNDO !!!");
-    API_HD44780_SetBacklight(myLCD, (toogleBackLight++)%2?BACKLIGHToN:BACKLIGHToFF);
     HAL_Delay(1000);
     //HAL_UART_Transmit(&huart3,"HOLA MUNDO!!!\r\n",15,5000);
     //printf("HOLA MUNDO %02X\r\n", toogleBackLight);

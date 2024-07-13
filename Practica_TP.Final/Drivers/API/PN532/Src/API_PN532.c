@@ -245,7 +245,7 @@ PN532_Error_t API_PN532_ReadTag(PN532_t instance)
     API_PN532_HAL_Delay(10);
     if(PN532oK == API_PN532_ReceiveAck())
     {
-      API_PN532_HAL_Delay(10);
+      API_PN532_HAL_Delay(50);
       if(PN532oK == API_PN532_ReceiveResponse((uint8_t *)response, sizeof(response)))
       {
         if(NOtAGpRESENT != response[1])
