@@ -106,9 +106,12 @@ int main(void)
   PN532_t myTagReader = NULL;
   myTagReader = API_PN532_Init();
 
-  GPIO_t userButton = {USER_BtnC13_GPIO_Port, USER_BtnC13_Pin};
-  DebounceGPI_t altaTag = NULL;
-  altaTag = API_Debounce_Init(userButton);
+  GPIO_t userButtonC8 = {USER_BtnC8_GPIO_Port, USER_BtnC8_Pin};
+  GPIO_t userButtonC9 = {USER_BtnC9_GPIO_Port, USER_BtnC9_Pin};
+  DebounceGPI_t userBnC8 = NULL;
+  DebounceGPI_t userBnC9 = NULL;
+  userBnC8 = API_Debounce_Init(userButtonC8);
+  userBnC9 = API_Debounce_Init(userButtonC9);
   HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, GPIO_PIN_RESET);
   /* USER CODE END 2 */
 
@@ -116,11 +119,11 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  if(PN532oK == API_PN532_ReadTag(myTagReader))
+    if(PN532oK == API_PN532_ReadTag(myTagReader))
   	{
 	    API_PN532_GetTag(myTagReader, myTag, 4);
-	    API_HD44780_SetBacklight(myLCD,BACKLIGHToN);
-  	  API_HD44780_SetCursor(myLCD, LINE1, 0);
+      API_HD44780_SetBacklight(myLCD,BACKLIGHToN);
+      API_HD44780_SetCursor(myLCD, LINE1, 0);
       API_HD44780_SendString(myLCD, (uint8_t*)"Tag Detected:   ");
       API_HD44780_SetCursor(myLCD, LINE2, 0);
       sprintf((char*)line, "%02X %02X %02X %02X    ", myTag[0], myTag[1], myTag[2], myTag[3]);
@@ -134,19 +137,23 @@ int main(void)
       API_HD44780_SendString(myLCD, (uint8_t*)"   MUNDO !!!!   ");
 	  }
 
-    API_Debounce_Update(altaTag);
-    if(API_Debounce_ReadKey(altaTag))
+    API_Debounce_Update(userBnC8);
+    if(API_Debounce_ReadKey(userBnC8))
       HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
 
-    if(HAL_GPIO_ReadPin(USER_BtnC13_GPIO_Port, USER_BtnC13_Pin))
-      HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin,GPIO_PIN_RESET);
-    else
-      HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin,GPIO_PIN_SET);
+    API_Debounce_Update(userBnC9);
+        if(API_Debounce_ReadKey(userBnC9))
+          HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
 
-    if(HAL_GPIO_ReadPin(USER_BtnA4_GPIO_Port, USER_BtnA4_Pin))
+    if(HAL_GPIO_ReadPin(USER_BtnC8_GPIO_Port, USER_BtnC8_Pin))
       HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin,GPIO_PIN_RESET);
     else
       HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin,GPIO_PIN_SET);
+
+    if(HAL_GPIO_ReadPin(USER_BtnC9_GPIO_Port, USER_BtnC9_Pin))
+      HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin,GPIO_PIN_RESET);
+    else
+      HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin,GPIO_PIN_SET);
 
     //HAL_UART_Transmit(&huart3,"HOLA MUNDO!!!\r\n",15,5000);
     //printf("HOLA MUNDO %02X\r\n", toogleBackLight);
@@ -346,24 +353,18 @@ static void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, LD1_Pin|LD3_Pin|LD2_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : USER_Btn_Pin */
-  GPIO_InitStruct.Pin = USER_Btn_Pin;
+  /*Configure GPIO pins : USER_Btn_Pin USER_BtnC8_Pin USER_BtnC9_Pin */
+  GPIO_InitStruct.Pin = USER_Btn_Pin|USER_BtnC8_Pin|USER_BtnC9_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(USER_Btn_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : USER_BtnA4_Pin */
-  GPIO_InitStruct.Pin = USER_BtnA4_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(USER_BtnA4_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LD1_Pin LD3_Pin LD2_Pin */
   GPIO_InitStruct.Pin = LD1_Pin|LD3_Pin|LD2_Pin;
