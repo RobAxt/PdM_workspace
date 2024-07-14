@@ -45,16 +45,6 @@ static struct UserADM_s userGroup = {0};
   * @param  ...
   * @retval ...
   */
-//void APP_UserADM_Init(void)
-//{
-//
-//}
-
-/**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
-  */
 bool_t APP_UserADM_AddUser(uint8_t * user, uint8_t size)
 {
   bool_t storeSuccess = false;

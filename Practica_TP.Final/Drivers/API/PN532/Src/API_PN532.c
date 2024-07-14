@@ -32,12 +32,6 @@ static const uint8_t INlISTpASSIVEtARGET[] = {0x00, 0x00, 0xFF, 0x04, 0XFC, 0XD4
 
 typedef struct
 {
-  uint8_t uid[MAXUIDsIZE];
-  uint8_t size;
-} PN532_Tag_t;
-
-typedef struct
-{
   uint8_t ic;
   uint8_t version;
   uint8_t revision;

@@ -98,78 +98,18 @@ int main(void)
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  int8_t line[DISPLAYlINEsIZE];
-  API_HD44780_t myLCD = NULL;
-  myLCD = API_HD44780_Init(0x27, BACKLIGHToN);
-  bool_t singleUserFlag = true;
-  uint8_t myTag[4] = {0};
-  PN532_t myTagReader = NULL;
-  myTagReader = API_PN532_Init();
-
   GPIO_t userButtonC8 = {USER_BtnC8_GPIO_Port, USER_BtnC8_Pin};
   GPIO_t userButtonC9 = {USER_BtnC9_GPIO_Port, USER_BtnC9_Pin};
-  DebounceGPI_t userBnC8 = NULL;
-  DebounceGPI_t userBnC9 = NULL;
-  userBnC8 = API_Debounce_Init(userButtonC8);
-  userBnC9 = API_Debounce_Init(userButtonC9);
-  HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, GPIO_PIN_RESET);
+  FSM_t appFSM;
+  appFSM = APP_FSM_Init(userButtonC8, userButtonC9);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    if(PN532oK == API_PN532_ReadTag(myTagReader))
-  	{
-	    API_PN532_GetTag(myTagReader, myTag, 4);
-
-	    if(!APP_UserADM_ValidUser(myTag,4) && singleUserFlag)
-	    {
-	      APP_UserADM_AddUser(myTag,4);
-	      singleUserFlag = false;
-	    }
-
-      API_HD44780_SetCursor(myLCD, LINE1, 0);
-      if(!APP_UserADM_ValidUser(myTag,4))
-      {
-        API_HD44780_SendString(myLCD, (uint8_t*)"Tag Detected:   ");
-      }
-      else
-      {
-        API_HD44780_SendString(myLCD, (uint8_t*)"Valid Tag:      ");
-      }
-      API_HD44780_SetCursor(myLCD, LINE2, 0);
-      sprintf((char*)line, "%02X %02X %02X %02X    ", myTag[0], myTag[1], myTag[2], myTag[3]);
-      API_HD44780_SendString(myLCD, (uint8_t*)line);
-	  }
-	  else
-	  {
-      API_HD44780_SetCursor(myLCD, LINE1, 0);
-      API_HD44780_SendString(myLCD, (uint8_t*)"HOLA            ");
-      API_HD44780_SetCursor(myLCD, LINE2, 0);
-      API_HD44780_SendString(myLCD, (uint8_t*)"   MUNDO !!!!   ");
-	  }
-
-    API_Debounce_Update(userBnC8);
-    if(API_Debounce_ReadKey(userBnC8))
-      HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
-
-    API_Debounce_Update(userBnC9);
-        if(API_Debounce_ReadKey(userBnC9))
-          HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
-
-    if(HAL_GPIO_ReadPin(USER_BtnC8_GPIO_Port, USER_BtnC8_Pin))
-      HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin,GPIO_PIN_RESET);
-    else
-      HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin,GPIO_PIN_SET);
-
-    if(HAL_GPIO_ReadPin(USER_BtnC9_GPIO_Port, USER_BtnC9_Pin))
-      HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin,GPIO_PIN_RESET);
-    else
-      HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin,GPIO_PIN_SET);
-
-    //HAL_UART_Transmit(&huart3,"HOLA MUNDO!!!\r\n",15,5000);
-    //printf("HOLA MUNDO %02X\r\n", toogleBackLight);
+    APP_FSM_Update(appFSM);
 
     /* USER CODE END WHILE */
 

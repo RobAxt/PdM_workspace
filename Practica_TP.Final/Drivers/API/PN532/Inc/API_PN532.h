@@ -19,7 +19,7 @@
 
 /* Exported constants --------------------------------------------------------*/
 
-#define MAXUIDsIZE 		10 	// More Info @ --> https://www.nfc-tag-shop.de/info/en/knowledge/uid-uniquely-identify-and-clone-nfc-tags/
+#define MAXUIDsIZE      10  // More Info @ --> https://www.nfc-tag-shop.de/info/en/knowledge/uid-uniquely-identify-and-clone-nfc-tags/
 #define PN532aDDRESS  0x24
 #define NOTiNITIALIZED   0
 /*----------------------------------------------------------------------------*/
@@ -27,6 +27,12 @@
 /* Exported types ------------------------------------------------------------*/
 
 typedef struct PN532_s * PN532_t;
+
+typedef struct
+{
+  uint8_t uid[MAXUIDsIZE];
+  uint8_t size;
+} PN532_Tag_t;
 
 typedef enum {
   PN532oK = 0,

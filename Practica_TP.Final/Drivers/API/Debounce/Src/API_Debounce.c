@@ -82,7 +82,7 @@ void API_Debounce_Update(DebounceGPI_t pushButton)
         if(DOWN == API_Debounce_HAL_ReadButtonState(pushButton->gpio))
           pushButton->currentState = BUTTON_FALLING;
         break;
-    case BUTTON_FALLING:
+      case BUTTON_FALLING:
         if(API_Delay_DelayTimeOut(pushButton->debounceDelay))
         {
           if(DOWN == API_Debounce_HAL_ReadButtonState(pushButton->gpio))
