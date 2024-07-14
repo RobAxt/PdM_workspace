@@ -34,6 +34,7 @@ extern "C" {
 #include "API_HD44780.h"
 #include "API_PN532.h"
 #include "API_Debounce.h"
+#include "UserADM.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

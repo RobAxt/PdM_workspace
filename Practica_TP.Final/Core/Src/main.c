@@ -101,7 +101,7 @@ int main(void)
   int8_t line[DISPLAYlINEsIZE];
   API_HD44780_t myLCD = NULL;
   myLCD = API_HD44780_Init(0x27, BACKLIGHToN);
-
+  bool_t singleUserFlag = true;
   uint8_t myTag[4] = {0};
   PN532_t myTagReader = NULL;
   myTagReader = API_PN532_Init();
@@ -122,9 +122,22 @@ int main(void)
     if(PN532oK == API_PN532_ReadTag(myTagReader))
   	{
 	    API_PN532_GetTag(myTagReader, myTag, 4);
-      API_HD44780_SetBacklight(myLCD,BACKLIGHToN);
+
+	    if(!APP_UserADM_ValidUser(myTag,4) && singleUserFlag)
+	    {
+	      APP_UserADM_AddUser(myTag,4);
+	      singleUserFlag = false;
+	    }
+
       API_HD44780_SetCursor(myLCD, LINE1, 0);
-      API_HD44780_SendString(myLCD, (uint8_t*)"Tag Detected:   ");
+      if(!APP_UserADM_ValidUser(myTag,4))
+      {
+        API_HD44780_SendString(myLCD, (uint8_t*)"Tag Detected:   ");
+      }
+      else
+      {
+        API_HD44780_SendString(myLCD, (uint8_t*)"Valid Tag:      ");
+      }
       API_HD44780_SetCursor(myLCD, LINE2, 0);
       sprintf((char*)line, "%02X %02X %02X %02X    ", myTag[0], myTag[1], myTag[2], myTag[3]);
       API_HD44780_SendString(myLCD, (uint8_t*)line);

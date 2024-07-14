@@ -177,7 +177,7 @@ uint8_t API_PN532_GetSupport(PN532_t instance)
   * @param  ...
   * @retval ...
   */
-PN532_t API_PN532_Init()
+PN532_t API_PN532_Init(void)
 {
   static struct PN532_s this = {0};
 
@@ -202,7 +202,7 @@ PN532_t API_PN532_Init()
 		    this.firmware.version  = tmp.version;
 		    this.firmware.revision = tmp.revision;
         this.firmware.support  = tmp.support;
-	  }
+      }
     }
   }
 
@@ -216,11 +216,10 @@ PN532_t API_PN532_Init()
       API_PN532_HAL_Delay(10);
       if(PN532oK == API_PN532_ReceiveResponse((uint8_t *)response, sizeof(response)))
       {
-		// Do Nothing...
-	  }
+        // Do Nothing...
+      }
     }
   }
-
   return &this;
 }
 

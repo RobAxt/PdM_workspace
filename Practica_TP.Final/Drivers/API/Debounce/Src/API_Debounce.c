@@ -154,5 +154,6 @@ DebounceGPI_t API_Debounce_AllocateInstance(void)
 
   return newInstance;
 }
+
 /*----------------------------------------------------------------------------*/
 

@@ -11,6 +11,7 @@
 /* Includes ------------------------------------------------------------------*/
 
 #include <stdbool.h>
+#include <stdint.h>
 #include "API_Delay.h"
 #include "API_Debounce_HAL.h"
 

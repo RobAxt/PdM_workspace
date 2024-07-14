@@ -42,7 +42,7 @@ typedef enum {
 
 /* Exported functions prototypes ---------------------------------------------*/
 
-PN532_t       API_PN532_Init();
+PN532_t       API_PN532_Init(void);
 PN532_Error_t API_PN532_ReadTag(PN532_t instance);
 
 uint8_t API_PN532_GetTag(PN532_t instance, uint8_t *uid, const uint8_t size);
