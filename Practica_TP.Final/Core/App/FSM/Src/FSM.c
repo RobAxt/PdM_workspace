@@ -239,7 +239,7 @@ static FSMstates_t APP_FSM_DeleteState(FSM_t fsm)
   FSMstates_t nextState = DELETE;
   int8_t line[DISPLAYlINEsIZE] = {0};
 
-  APP_UserADM_AddDelete(fsm->currentTag.uid, fsm->currentTag.size);
+  APP_UserADM_DeleteUser(fsm->currentTag.uid, fsm->currentTag.size);
   fsm->currentTag.size = 0;
 
   API_HD44780_SetCursor(fsm->diplayLCD, LINE1, 0);

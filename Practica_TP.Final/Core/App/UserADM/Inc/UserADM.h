@@ -35,7 +35,7 @@ typedef bool bool_t;
 /* Exported functions prototypes ---------------------------------------------*/
 
 bool_t APP_UserADM_AddUser(uint8_t * user, uint8_t size);
-bool_t APP_UserADM_AddDelete(uint8_t * user, uint8_t size);
+bool_t APP_UserADM_DeleteUser(uint8_t * user, uint8_t size);
 bool_t APP_UserADM_ValidUser(uint8_t * user, uint8_t size);
 
 /*----------------------------------------------------------------------------*/

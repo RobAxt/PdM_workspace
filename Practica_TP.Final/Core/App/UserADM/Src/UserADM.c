@@ -77,7 +77,7 @@ bool_t APP_UserADM_AddUser(uint8_t * user, uint8_t size)
   * @param  ...
   * @retval ...
   */
-bool_t APP_UserADM_AddDelete(uint8_t * user, uint8_t size)
+bool_t APP_UserADM_DeleteUser(uint8_t * user, uint8_t size)
 {
   if(NULL != user && ZERO != size)
   {
