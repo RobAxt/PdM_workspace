@@ -134,16 +134,16 @@ int main(void)
       API_HD44780_SendString(myLCD, (uint8_t*)"   MUNDO !!!!   ");
 	  }
 
-	  API_Debounce_Update(altaTag);
-	  if(API_Debounce_ReadKey(altaTag))
-	    HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
+    API_Debounce_Update(altaTag);
+    if(API_Debounce_ReadKey(altaTag))
+      HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
 
     if(HAL_GPIO_ReadPin(USER_BtnC13_GPIO_Port, USER_BtnC13_Pin))
       HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin,GPIO_PIN_RESET);
     else
       HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin,GPIO_PIN_SET);
 
-    if(HAL_GPIO_ReadPin(USER_BtnA2_GPIO_Port, USER_BtnA2_Pin))
+    if(HAL_GPIO_ReadPin(USER_BtnA4_GPIO_Port, USER_BtnA4_Pin))
       HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin,GPIO_PIN_RESET);
     else
       HAL_GPIO_WritePin(LD3_GPIO_Port, LD3_Pin,GPIO_PIN_SET);
@@ -359,11 +359,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(USER_Btn_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : USER_BtnA2_Pin */
-  GPIO_InitStruct.Pin = USER_BtnA2_Pin;
+  /*Configure GPIO pin : USER_BtnA4_Pin */
+  GPIO_InitStruct.Pin = USER_BtnA4_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(USER_BtnA2_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(USER_BtnA4_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LD1_Pin LD3_Pin LD2_Pin */
   GPIO_InitStruct.Pin = LD1_Pin|LD3_Pin|LD2_Pin;
