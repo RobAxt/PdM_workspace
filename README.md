@@ -11,4 +11,6 @@ Programación de Microcontroladores
 ## Práctica 3:
 * Punto 2: en directorio PdM_workspace/Practica_03.02
 * Punto 3: en directorio PdM_workspace/Practica_03.03
-
+## Práctica 4:
+* Punto 1: en directorio PdM_workspace/Practica_04.01
+* Punto 2: en directorio PdM_workspace/Practica_04.02
