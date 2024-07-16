@@ -40,6 +40,8 @@ VT --> VT : Valid Tag
 VT --> AT : Add PB clicked
 AT --> WT : Timeout
 IT --> WT : No Tag
+IT --> AT : Add PB clicked
+IT --> IT 
 VT --> IT : Invalid Tag
 VT --> DT : Delete PB clicked
 DT --> WT : Timeout

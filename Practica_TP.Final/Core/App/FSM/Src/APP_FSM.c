@@ -273,9 +273,16 @@ static FSMstates_t APP_FSM_InvalidState(FSM_t fsm)
   sprintf((char*)line, "%02X %02X %02X %02X    ", fsm->currentTag.uid[0], fsm->currentTag.uid[1], fsm->currentTag.uid[2], fsm->currentTag.uid[3]);
   API_HD44780_SendString(fsm->diplayLCD, (uint8_t*)line);
 
-  if(PN532oK != API_PN532_ReadTag(fsm->tagReader))
+  if(API_Debounce_ReadKey(fsm->addPB)) // If add Tag Button was pressed then Go to Add...
   {
-    nextState = WAITING;
+    nextState = ADD;
+  }
+  else
+  {
+    if(PN532oK != API_PN532_ReadTag(fsm->tagReader))
+    {
+      nextState = WAITING;
+    }
   }
 
   return nextState;
