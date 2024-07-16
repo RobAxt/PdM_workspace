@@ -155,7 +155,7 @@ static FSMstates_t APP_FSM_WaitingState(FSM_t fsm)
   */
 static FSMstates_t APP_FSM_VerifyState(FSM_t fsm)
 {
-  FSMstates_t nextState = WAITING;
+  FSMstates_t nextState = VERIFY;
   int8_t line[DISPLAYlINEsIZE] = {0};
 
   fsm->currentTag.size = API_PN532_GetTag(fsm->tagReader, fsm->currentTag.uid, MAXUIDsIZE);
@@ -178,21 +178,10 @@ static FSMstates_t APP_FSM_VerifyState(FSM_t fsm)
       {
         nextState = DELETE;
       }
-      else // stay in this state
-      {
-        nextState = VERIFY;
-      }
     }
     else  // The Tag is Invalid
     {
-      if(API_Debounce_ReadKey(fsm->addPB)) // If add Tag Button was pressed then Go to Add...
-      {
-        nextState = ADD;
-      }
-      else
-      {
-        nextState = INVALID;
-      }
+      nextState = INVALID;
     }
 
     if(PN532nOtAG == API_PN532_ReadTag(fsm->tagReader))
