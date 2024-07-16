@@ -35,7 +35,7 @@ state "ADD TAG" as AT: do / add current tag.
 state "DELETE TAG" as DT: do / delete current tag.
 WT --> VT : Tag found
 VT --> WT : No Tag
-VT --> Vt : Valid Tag
+VT --> VT : Valid Tag
 VT --> AT : Add PB clicked
 AT --> WT : Timeout
 IT --> WT : No Tag
