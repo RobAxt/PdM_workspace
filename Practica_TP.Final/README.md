@@ -3,17 +3,19 @@
 ```mermaid 
 stateDiagram-v2 
 [*] --> WT
-state "Waiting Tag" as WT: Waiting for a Tag to read
-state "Verify Tag" as VT: Verifing Valid Tag
-state "Invalid Tag" as IT: Invalid Tag 
-state "Add Tag" as AT: Adding current Tag to user array
-state "Delete Tag" as DT: Deleteing current Tag from user array.
+state "WAITING TAG" as WT: do / wait for tag
+state "VERIFY TAG" as VT: do / verify current tag
+VT: do / if valid check delete pushbutton
+VT: do / if invalid check add pushbutton 
+state "INVALID TAG" as IT: infom / invalid Tag 
+state "ADD TAG" as AT: do / add current tag
+state "DELETE TAG" as DT: do / delete current tag array.
 WT --> VT : Tag found
 VT --> WT : No Tag
-VT --> AT : Add PushButton clicked
+VT --> AT : Add PB clicked
 AT --> WT : Timeout
 IT --> WT : No Tag
 VT --> IT : Invalid Tag
-VT --> DT : Delete PushButton clicked
+VT --> DT : Delete PB clicked
 DT --> WT : Timeout
 ```
