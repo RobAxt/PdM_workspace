@@ -31,7 +31,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "FSM.h"
+#include "APP_FSM.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

@@ -95,9 +95,13 @@ static PN532_Error_t API_PN532_ReceiveResponse(uint8_t *response, uint8_t size);
 /* API code ------------------------------------------------------------------*/
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  function to retrieve the current tad readed
+  * @param  PN532_t instance: pointer to the hidden structure.
+  * @param  uint8_t *uid: poiter to the allocated array that will contain the tad uid
+  * @param  const uint8_t size: the size of the tag uid
+  * @retval uint8_t: if ok, return the size of the uid tag; otherwise, it indicates that
+  *                  the instance was not initialized.
+
   */
 uint8_t API_PN532_GetTag(PN532_t instance, uint8_t *uid, const uint8_t size)
 {
@@ -111,9 +115,10 @@ uint8_t API_PN532_GetTag(PN532_t instance, uint8_t *uid, const uint8_t size)
 }
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Get the IC version
+  * @param  PN532_t instance: pointer to the hidden structure.
+  * @retval uint8_t: return IC version if ok; otherwise it will indicate that the instance was
+  *                  not initialized..
   */
 uint8_t API_PN532_GetIC(PN532_t instance)
 {
@@ -125,9 +130,10 @@ uint8_t API_PN532_GetIC(PN532_t instance)
 }
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Get the firmware version
+  * @param  PN532_t instance: pointer to the hidden structure.
+  * @retval uint8_t: return firmware version if ok; otherwise it will indicate that the instance was
+  *                  not initialized..
   */
 uint8_t API_PN532_GetVersion(PN532_t instance)
 {
@@ -139,9 +145,10 @@ uint8_t API_PN532_GetVersion(PN532_t instance)
 }
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Get the IC revision
+  * @param  PN532_t instance: pointer to the hidden structure.
+  * @retval uint8_t: return IC revision if ok; otherwise it will indicate that the instance was
+  *                  not initialized..
   */
 uint8_t API_PN532_GetRevision(PN532_t instance)
 {
@@ -153,9 +160,10 @@ uint8_t API_PN532_GetRevision(PN532_t instance)
 }
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Get the type of tags supported
+  * @param  PN532_t instance: pointer to the hidden structure.
+  * @retval uint8_t: return the type of tags supported if ok; otherwise it will indicate
+  *                  that the instance was not initialized..
   */
 uint8_t API_PN532_GetSupport(PN532_t instance)
 {
@@ -167,9 +175,10 @@ uint8_t API_PN532_GetSupport(PN532_t instance)
 }
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Initialize the elements of the structure and send the SAM Config
+  *         command to the PN532 to enable the reading of the tags.
+  * @param  None
+  * @retval PN532_t: returns the pointer to the hidden structure
   */
 PN532_t API_PN532_Init(void)
 {
@@ -186,10 +195,11 @@ PN532_t API_PN532_Init(void)
       API_PN532_HAL_Delay(10);
       if(PN532oK == API_PN532_ReceiveResponse((uint8_t *)response, sizeof(response)))
       {
+        //Looking for the beginning of the frame, the first byte used to be garbage and we have to find the correct alignment using the preamble bytes.
         uint8_t offset=0;
         while(memcmp(&response[offset], PREAMBLEsTART, sizeof(PREAMBLEsTART)) && offset < (sizeof(PN532_Firmware_Response_t)-sizeof(PREAMBLEsTART)))
           offset++;
-
+        //Once the correct alignment is found, we can store the received bytes in the structure for easy decode.
         memcpy(&tmp, &response[offset], sizeof(PN532_Firmware_Response_t));
 		
 		    this.firmware.ic       = tmp.ic;
@@ -210,7 +220,8 @@ PN532_t API_PN532_Init(void)
       API_PN532_HAL_Delay(10);
       if(PN532oK == API_PN532_ReceiveResponse((uint8_t *)response, sizeof(response)))
       {
-        // Do Nothing...
+        //Just retrieve the answer and do nothing with it.
+        //TODO: Actually should check if it returns the correct answer
       }
     }
   }
@@ -218,9 +229,9 @@ PN532_t API_PN532_Init(void)
 }
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Read the UID of the Tag if it is present.
+  * @param  PN532_t instance: pointer to the hidden structure.
+  * @retval PN532_Error_t: enum that indicates the status of the transaction with the PN532.
   */
 PN532_Error_t API_PN532_ReadTag(PN532_t instance)
 {
@@ -243,18 +254,19 @@ PN532_Error_t API_PN532_ReadTag(PN532_t instance)
       {
         if(NOtAGpRESENT != response[1])
         {
+          //Looking for the beginning of the frame, the first byte used to be garbage and we have to find the correct alignment using the preamble bytes.
           uint8_t offset=0;
           while(memcmp(&response[offset], PREAMBLEsTART, sizeof(PREAMBLEsTART)) && offset < (sizeof(PN532_Tag_Response_t)-sizeof(PREAMBLEsTART)))
             offset++;
-
+          //Once the correct alignment is found, we can store the received bytes in the structure for easy decode.
 		      memcpy(&tmp, &response[offset], sizeof(PN532_Tag_Response_t));
 
 		      //TODO: generic tag uid size...
-          instance->tag.size = tmp.size;
-          instance->tag.uid[0] =  tmp.tag0;
-          instance->tag.uid[1] =  tmp.tag1;
-          instance->tag.uid[2] =  tmp.tag2;
-          instance->tag.uid[3] =  tmp.tag3;
+          instance->tag.size   = tmp.size;
+          instance->tag.uid[0] = tmp.tag0;
+          instance->tag.uid[1] = tmp.tag1;
+          instance->tag.uid[2] = tmp.tag2;
+          instance->tag.uid[3] = tmp.tag3;
 
           result = PN532oK;
         }
@@ -286,9 +298,10 @@ PN532_Error_t API_PN532_ReadTag(PN532_t instance)
 /* Private API code ----------------------------------------------------------*/
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Encapsulated the writing of a command frame.
+  * @param  uint8_t *response: pointer to the allocated buffer with the correct size.
+  * @param  uint8_t size: size of the stored buffer.
+  * @retval PN532_Error_t: enum that indicates the status of the transaction with the PN532.
   */
 static PN532_Error_t API_PN532_SendCommand(uint8_t *command, const uint8_t size)
 {
@@ -296,9 +309,9 @@ static PN532_Error_t API_PN532_SendCommand(uint8_t *command, const uint8_t size)
 }
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Validates that the frame received is a correct acknowledge.
+  * @param  None.
+  * @retval PN532_Error_t: enum that indicates the status of the transaction with the PN532.
   */
 static PN532_Error_t API_PN532_ReceiveAck(void)
 {
@@ -308,11 +321,11 @@ static PN532_Error_t API_PN532_ReceiveAck(void)
   {
     return PN532bADrESPONSE;
   }
-
+  //Looking for the beginning of the frame, the first byte used to be garbage and we have to find the correct alignment using the preamble bytes.
   uint8_t offset=0;
   while(memcmp(&acknowledge[offset], PREAMBLEsTART, sizeof(PREAMBLEsTART)) && offset < (sizeof(ACKNOLEDGE)-sizeof(PREAMBLEsTART)))
     offset++;
-
+  //Once the correct alignment is found, we can check that the bytes received are the same as those of the acknowledgment frame.
   if(memcmp(&acknowledge[offset], ACKNOLEDGE, sizeof(ACKNOLEDGE)))
   {
     return PN532bADaCK;
@@ -322,9 +335,10 @@ static PN532_Error_t API_PN532_ReceiveAck(void)
 }
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Encapsulated the reading of a response frame.
+  * @param  uint8_t *response: pointer to the allocated buffer with the correct size.
+  * @param  uint8_t size: size of the stored buffer.
+  * @retval PN532_Error_t: enum that indicates the status of the transaction with the PN532.
   */
 static PN532_Error_t API_PN532_ReceiveResponse(uint8_t *response, uint8_t size)
 {

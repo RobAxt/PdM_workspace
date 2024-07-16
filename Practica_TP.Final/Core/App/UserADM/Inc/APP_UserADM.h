@@ -1,43 +1,42 @@
 /*
- * FSM.h
+ * UserADM.h
  *
  *  Created on: Jul 14, 2024
  *      Author: raxt
  */
 
-#ifndef APP_FSM_INC_FSM_H_
-#define APP_FSM_INC_FSM_H_
+#ifndef APP_USERADM_INC_APP_USERADM_H_
+#define APP_USERADM_INC_APP_USERADM_H_
 
 /* Includes ------------------------------------------------------------------*/
 
-#include <stdbool.h>
 #include <stdint.h>
+#include <stdbool.h>
+#include <stdio.h>
 #include <string.h>
-
-#include "UserADM.h"
-#include "API_Delay.h"
-#include "API_Debounce.h"
-#include "API_HD44780.h"
-#include "API_PN532.h"
-
 /*----------------------------------------------------------------------------*/
 
 /* Exported constants --------------------------------------------------------*/
 
+#define MAXuSERSIZE 10
+#define MAXuSER     10
 
 /*----------------------------------------------------------------------------*/
 
 /* Exported types ------------------------------------------------------------*/
 
-typedef struct FSM_s * FSM_t;
+#ifndef BOOL_TYPE_DEFINITIOON_
+#define BOOL_TYPE_DEFINITIOON_
+typedef bool bool_t;
+#endif // BOOL_TYPE_DEFINITIOON_
 
 /*----------------------------------------------------------------------------*/
 
-/* Exported functions ------------------------------------------------------- */
+/* Exported functions prototypes ---------------------------------------------*/
 
-FSM_t  APP_FSM_Init(GPIO_t signInButton, GPIO_t eraseButton);
-void   APP_FSM_Update(FSM_t fsm);
+bool_t APP_UserADM_AddUser(uint8_t * user, uint8_t size);
+bool_t APP_UserADM_DeleteUser(uint8_t * user, uint8_t size);
+bool_t APP_UserADM_ValidUser(uint8_t * user, uint8_t size);
 
 /*----------------------------------------------------------------------------*/
-
-#endif /* APP_FSM_INC_FSM_H_ */
+#endif /* APP_USERADM_INC_APP_USERADM_H_ */
