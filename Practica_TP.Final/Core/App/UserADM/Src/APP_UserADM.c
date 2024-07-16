@@ -52,7 +52,8 @@ bool_t APP_UserADM_AddUser(uint8_t * user, uint8_t size)
   {
     for(uint8_t index = 0; MAXuSER > index; index++)
     {
-      if(ZERO == userGroup.users[index].size) // If user do not exists and there is an empty slot then store it
+      // If user do not exists and there is an empty slot then store it
+      if(ZERO == userGroup.users[index].size)
       {
         memcpy(userGroup.users[index].userId, user, size);
         userGroup.users[index].size = size;
@@ -60,8 +61,8 @@ bool_t APP_UserADM_AddUser(uint8_t * user, uint8_t size)
         break;
       }
       else
-      {
-        if(!memcmp(user, userGroup.users[index].userId, size) && size == userGroup.users[index].size) // If the user already exists
+      { // If the user already exists do nothing and enjoy the easy success
+        if(!memcmp(user, userGroup.users[index].userId, size) && size == userGroup.users[index].size)
         {
           storeSuccess = true;
           break;
@@ -83,6 +84,7 @@ bool_t APP_UserADM_DeleteUser(uint8_t * user, uint8_t size)
   {
     for(uint8_t index = 0; MAXuSER > index; index++)
     {
+      // Find the user and delete
       if(!memcmp(user, userGroup.users[index].userId, size) && size == userGroup.users[index].size)
       {
         memset(userGroup.users[index].userId, ZERO, userGroup.users[index].size);
