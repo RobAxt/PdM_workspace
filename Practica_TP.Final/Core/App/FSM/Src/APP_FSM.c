@@ -56,9 +56,10 @@ static FSMstates_t APP_FSM_InvalidState(FSM_t fsm);
 /* APP code ------------------------------------------------------------------*/
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Allocates and Initialize the aplication FSM
+  * @param  GPIO_t signInButton: pushbutton for adding a new Tag
+  * @param  GPIO_t eraseButton: pushbutton for delete current Tag
+  * @retval FSM_t: pointer to the allocated single instance
   */
 FSM_t APP_FSM_Init(GPIO_t signInButton, GPIO_t eraseButton)
 {
@@ -81,9 +82,9 @@ FSM_t APP_FSM_Init(GPIO_t signInButton, GPIO_t eraseButton)
 }
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Refresh the state of the current FSM instance
+  * @param  FSM_t fsm: FSM structure to refresh
+  * @retval None
   */
 void APP_FSM_Update(FSM_t fsm)
 {
@@ -120,16 +121,16 @@ void APP_FSM_Update(FSM_t fsm)
 /* Private APP code ----------------------------------------------------------*/
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Waiting state: in this state the FSM waits for a tag to be present
+  * @param  FSM_t fsm: pointer to the hidden fsm structure
+  * @retval FSMstates_t: return next state
   */
 static FSMstates_t APP_FSM_WaitingState(FSM_t fsm)
 {
   PN532_Error_t tagStatus = API_PN532_ReadTag(fsm->tagReader);
   FSMstates_t nextState = WAITING;
 
-  if(PN532oK != tagStatus) // If No Tag pressent or something wrong stay here
+  if(PN532oK != tagStatus) // If No Tag present or something wrong stay here
   {
     API_HD44780_SetCursor(fsm->diplayLCD, LINE1, 0);
     API_HD44780_SendString(fsm->diplayLCD, (uint8_t*)" Waiting Tag... ");
@@ -148,9 +149,9 @@ static FSMstates_t APP_FSM_WaitingState(FSM_t fsm)
 }
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Verify state: check if the tag readed is valid, also checks the gpio status.
+  * @param  FSM_t fsm: pointer to the hidden fsm structure
+  * @retval FSMstates_t: return next state
   */
 static FSMstates_t APP_FSM_VerifyState(FSM_t fsm)
 {
@@ -203,9 +204,9 @@ static FSMstates_t APP_FSM_VerifyState(FSM_t fsm)
 }
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Add state: add the current tag to the system
+  * @param  FSM_t fsm: pointer to the hidden fsm structure
+  * @retval FSMstates_t: return next state
   */
 static FSMstates_t APP_FSM_AddState(FSM_t fsm)
 {
@@ -230,9 +231,9 @@ static FSMstates_t APP_FSM_AddState(FSM_t fsm)
 }
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Delete state: deletes the current readed tag
+  * @param  FSM_t fsm: pointer to the hidden fsm structure
+  * @retval FSMstates_t: return next state
   */
 static FSMstates_t APP_FSM_DeleteState(FSM_t fsm)
 {
@@ -258,8 +259,8 @@ static FSMstates_t APP_FSM_DeleteState(FSM_t fsm)
 
 /**
   * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @param  FSM_t fsm: pointer to the hidden fsm structure
+  * @retval FSMstates_t: return next state
   */
 static FSMstates_t APP_FSM_InvalidState(FSM_t fsm)
 {

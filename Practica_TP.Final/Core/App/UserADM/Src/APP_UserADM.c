@@ -41,9 +41,10 @@ static struct UserADM_s userGroup = {0};
 /* API code ------------------------------------------------------------------*/
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Adds an user to the system
+  * @param  uint8_t * user: uid of the readed tag
+  * @param  uint8_t size: size of the UId readed
+  * @retval bool_t return true if the user could be added
   */
 bool_t APP_UserADM_AddUser(uint8_t * user, uint8_t size)
 {
@@ -74,9 +75,10 @@ bool_t APP_UserADM_AddUser(uint8_t * user, uint8_t size)
 }
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Delete an user from the system
+  * @param  uint8_t * user: uid of the readed tag
+  * @param  uint8_t size: size of the UId readed
+  * @retval bool_t return true if the user could be deleted
   */
 bool_t APP_UserADM_DeleteUser(uint8_t * user, uint8_t size)
 {
@@ -97,9 +99,10 @@ bool_t APP_UserADM_DeleteUser(uint8_t * user, uint8_t size)
 }
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Validates if the user exists or not
+  * @param  uint8_t * user: uid of the readed tag
+  * @param  uint8_t size: size of the UId readed
+  * @retval bool_t indicates if the user is valid or not
   */
 bool_t APP_UserADM_ValidUser(uint8_t * user, uint8_t size)
 {

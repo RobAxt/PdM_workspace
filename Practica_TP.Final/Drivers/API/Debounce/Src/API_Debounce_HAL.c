@@ -14,9 +14,9 @@
 /* Hardware Specific API code ------------------------------------------------*/
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Indicates the state of the gpio
+  * @param  GPIO_t pin: gpio structure to inspect
+  * @retval bool_t: return the state of the gpio
   */
 bool_t API_Debounce_HAL_ReadButtonState(GPIO_t pin)
 {

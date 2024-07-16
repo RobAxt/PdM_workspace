@@ -89,7 +89,6 @@ uint8_t API_HD44780_GetAddress(API_HD44780_t lcdInstance)
   * @param  address: the new PCF8574 I2C address
   * @retval None.
   */
-
 void API_HD44780_SetAddress(API_HD44780_t lcdInstance, uint8_t address)
 {
   if(NULL != lcdInstance)
@@ -119,7 +118,6 @@ backlight_t API_HD44780_GetBacklight(API_HD44780_t lcdInstance)
   * @param  backLight: the new backlight state.
   * @retval None.
   */
-
 void API_HD44780_SetBacklight(API_HD44780_t lcdInstance, backlight_t backLight)
 {
   if(NULL != lcdInstance)

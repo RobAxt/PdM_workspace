@@ -48,9 +48,9 @@ DebounceGPI_t API_Debounce_AllocateInstance(void);
 /* API code ------------------------------------------------------------------*/
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Initialize FSM structure for the specified GPIO
+  * @param  GPIO_t gpio: public structure that encapsulates the gpio format
+  * @retval DebounceGPI_t: return a pointer to the allocated memory structure
   */
 DebounceGPI_t API_Debounce_Init(GPIO_t gpio)
 {
@@ -68,9 +68,9 @@ DebounceGPI_t API_Debounce_Init(GPIO_t gpio)
 }
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Refresh the state of the current FSM instance
+  * @param  DebounceGPI_t pushButton: instance of the FSM to update
+  * @retval None
   */
 void API_Debounce_Update(DebounceGPI_t pushButton)
 {
@@ -113,9 +113,9 @@ void API_Debounce_Update(DebounceGPI_t pushButton)
 }
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Indicates if the pushbutton was pressed or not
+  * @param  DebounceGPI_t pushButton: instance of the FSM
+  * @retval bool_t: return true if the pushbutton was pressed
   */
 bool_t API_Debounce_ReadKey(DebounceGPI_t pushButton)
 {
@@ -133,9 +133,10 @@ bool_t API_Debounce_ReadKey(DebounceGPI_t pushButton)
 /* Private API code ----------------------------------------------------------*/
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Allocates memory for the DebounceGPI_s structure
+  * @param  None
+  * @retval DebounceGPI_t if the MAXdEBOUNCEiNTANCES is not exceded,
+  *         will return the pointer of the DebounceGPI_s
   */
 DebounceGPI_t API_Debounce_AllocateInstance(void)
 {

@@ -33,9 +33,9 @@ static Delay_t API_Delay_AllocateInstance(void);
 /* API code ------------------------------------------------------------------*/
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Obtain an instance and initialize the structure
+  * @param  tick_t duration: specifies the time of the delay
+  * @retval Delay_t: return an instance of the delay object
   */
 Delay_t API_Delay_Init(tick_t duration)
 {
@@ -96,9 +96,9 @@ void API_Delay_DelayDuration(Delay_t  delay, tick_t duration)
 /* Private API code ----------------------------------------------------------*/
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Allocates memory for the Delay_s structure
+  * @param  None.
+  * @retval Delay_t if the MAXdELAYiNTANCES is not exceded, will return the pointer of the Delay_s
   */
 static Delay_t API_Delay_AllocateInstance(void)
 {

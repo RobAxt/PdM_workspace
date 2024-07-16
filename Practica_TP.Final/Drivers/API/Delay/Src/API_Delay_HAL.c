@@ -14,9 +14,9 @@
 /* Hardware Specific API code ------------------------------------------------*/
 
 /**
-  * @brief  ...
-  * @param  ...
-  * @retval ...
+  * @brief  Encapsulates the hardware specific call to a blocking delay
+  * @param  uint32_t delay: delay in miliseconds.
+  * @retval None.
   */
 tick_t API_Delay_HAL_GetTick(void)
 {
