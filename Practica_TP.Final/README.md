@@ -34,6 +34,7 @@ state "INVALID TAG" as IT: infom / invalid Tag.
 state "ADD TAG" as AT: do / add current tag.
 state "DELETE TAG" as DT: do / delete current tag.
 WT --> VT : Tag found
+WT --> WT : No Tag
 VT --> WT : No Tag
 VT --> VT : Valid Tag
 VT --> AT : Add PB clicked
