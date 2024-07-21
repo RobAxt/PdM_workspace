@@ -89,6 +89,7 @@ typedef struct
 static PN532_Error_t API_PN532_SendCommand(uint8_t *command, const uint8_t size);
 static PN532_Error_t API_PN532_ReceiveAck(void);
 static PN532_Error_t API_PN532_ReceiveResponse(uint8_t *response, uint8_t size);
+static PN532_Error_t API_PN532_Transaction(uint8_t *command, size_t commandSize, uint8_t *response, size_t responseSize);
 
 /*----------------------------------------------------------------------------*/
 
@@ -187,44 +188,31 @@ PN532_t API_PN532_Init(void)
   uint8_t response[MAXrESPONSEsIZE] = {0};
   PN532_Firmware_Response_t tmp = {0};
 
-  if(PN532oK == API_PN532_SendCommand((uint8_t *)FIRMWARE, sizeof(FIRMWARE)))
+  // Send FIRMWARE command
+  if(PN532oK == API_PN532_Transaction((uint8_t *)FIRMWARE, sizeof(FIRMWARE), (uint8_t *)response, MAXrESPONSEsIZE))
   {
-    API_PN532_HAL_Delay(10);
-    if(PN532oK == API_PN532_ReceiveAck())
-    {
-      API_PN532_HAL_Delay(10);
-      if(PN532oK == API_PN532_ReceiveResponse((uint8_t *)response, sizeof(response)))
-      {
-        //Looking for the beginning of the frame, the first byte used to be garbage and we have to find the correct alignment using the preamble bytes.
-        uint8_t offset=0;
-        while(memcmp(&response[offset], PREAMBLEsTART, sizeof(PREAMBLEsTART)) && offset < (sizeof(PN532_Firmware_Response_t)-sizeof(PREAMBLEsTART)))
-          offset++;
-        //Once the correct alignment is found, we can store the received bytes in the structure for easy decode.
-        memcpy(&tmp, &response[offset], sizeof(PN532_Firmware_Response_t));
+    //Looking for the beginning of the frame, the first byte used to be garbage and we have to find the correct alignment using the preamble bytes.
+    uint8_t offset=0;
+    while(memcmp(&response[offset], PREAMBLEsTART, sizeof(PREAMBLEsTART)) && offset < (sizeof(PN532_Firmware_Response_t)-sizeof(PREAMBLEsTART)))
+      offset++;
+    //Once the correct alignment is found, we can store the received bytes in the structure for easy decode.
+    memcpy(&tmp, &response[offset], sizeof(PN532_Firmware_Response_t));
 		
-		    this.firmware.ic       = tmp.ic;
-		    this.firmware.version  = tmp.version;
-		    this.firmware.revision = tmp.revision;
-        this.firmware.support  = tmp.support;
-      }
-    }
+		this.firmware.ic       = tmp.ic;
+		this.firmware.version  = tmp.version;
+		this.firmware.revision = tmp.revision;
+    this.firmware.support  = tmp.support;
   }
 
   memset(response, ZERO, sizeof(response));
 
-  if(PN532oK == API_PN532_SendCommand((uint8_t *)SAMCONFIG, sizeof(SAMCONFIG)))
+  // Send SAMCONFIG command
+  if(PN532oK != API_PN532_Transaction((uint8_t *)SAMCONFIG, sizeof(SAMCONFIG),(uint8_t *)response, sizeof(response)))
   {
-    API_PN532_HAL_Delay(10);
-    if(PN532oK == API_PN532_ReceiveAck())
-    {
-      API_PN532_HAL_Delay(10);
-      if(PN532oK == API_PN532_ReceiveResponse((uint8_t *)response, sizeof(response)))
-      {
-        //Just retrieve the answer and do nothing with it.
-        //TODO: Actually should check if it returns the correct answer
-      }
-    }
+    memset(&this, ZERO, sizeof(this));
+    return NULL;
   }
+
   return &this;
 }
 
@@ -244,52 +232,35 @@ PN532_Error_t API_PN532_ReadTag(PN532_t instance)
       return result;
   }
 
-  if(PN532oK == API_PN532_SendCommand((uint8_t *)INlISTpASSIVEtARGET, sizeof(INlISTpASSIVEtARGET)))
+  result = API_PN532_Transaction((uint8_t *)INlISTpASSIVEtARGET, sizeof(INlISTpASSIVEtARGET), (uint8_t *)response, MAXrESPONSEsIZE);
+
+  if(PN532oK == result)
   {
-    API_PN532_HAL_Delay(10);
-    if(PN532oK == API_PN532_ReceiveAck())
+    if(NOtAGpRESENT != response[1])
     {
-      API_PN532_HAL_Delay(50);
-      if(PN532oK == API_PN532_ReceiveResponse((uint8_t *)response, sizeof(response)))
-      {
-        if(NOtAGpRESENT != response[1])
-        {
-          //Looking for the beginning of the frame, the first byte used to be garbage and we have to find the correct alignment using the preamble bytes.
-          uint8_t offset=0;
-          while(memcmp(&response[offset], PREAMBLEsTART, sizeof(PREAMBLEsTART)) && offset < (sizeof(PN532_Tag_Response_t)-sizeof(PREAMBLEsTART)))
-            offset++;
-          //Once the correct alignment is found, we can store the received bytes in the structure for easy decode.
-		      memcpy(&tmp, &response[offset], sizeof(PN532_Tag_Response_t));
+      //Looking for the beginning of the frame, the first byte used to be garbage and we have to find the correct alignment using the preamble bytes.
+      uint8_t offset=0;
+      while(memcmp(&response[offset], PREAMBLEsTART, sizeof(PREAMBLEsTART)) && offset < (sizeof(PN532_Tag_Response_t)-sizeof(PREAMBLEsTART)))
+        offset++;
+      //Once the correct alignment is found, we can store the received bytes in the structure for easy decode.
+		  memcpy(&tmp, &response[offset], sizeof(PN532_Tag_Response_t));
 
-		      //TODO: generic tag uid size...
-          instance->tag.size   = tmp.size;
-          instance->tag.uid[0] = tmp.tag0;
-          instance->tag.uid[1] = tmp.tag1;
-          instance->tag.uid[2] = tmp.tag2;
-          instance->tag.uid[3] = tmp.tag3;
+		  //TODO: generic tag uid size...
+      instance->tag.size   = tmp.size;
+      instance->tag.uid[0] = tmp.tag0;
+      instance->tag.uid[1] = tmp.tag1;
+      instance->tag.uid[2] = tmp.tag2;
+      instance->tag.uid[3] = tmp.tag3;
 
-          result = PN532oK;
-        }
-        else
-        {
-          memset(&instance->tag, ZERO, sizeof(instance->tag));
-          result = PN532nOtAG;
-        }
-      }
-      else
-      {
-        result = PN532bADrESPONSE;
-      }
+      result = PN532oK;
     }
     else
     {
-      result = PN532bADaCK;
+      memset(&instance->tag, ZERO, sizeof(instance->tag));
+      result = PN532nOtAG;
     }
   }
-  else
-  {
-    result = PN532bADcOMMAND;
-  }
+
   return result;
 }
 
@@ -299,7 +270,7 @@ PN532_Error_t API_PN532_ReadTag(PN532_t instance)
 
 /**
   * @brief  Encapsulated the writing of a command frame.
-  * @param  uint8_t *response: pointer to the allocated buffer with the correct size.
+  * @param  uint8_t *command: pointer to the allocated buffer with the correct size.
   * @param  uint8_t size: size of the stored buffer.
   * @retval PN532_Error_t: enum that indicates the status of the transaction with the PN532.
   */
@@ -345,4 +316,34 @@ static PN532_Error_t API_PN532_ReceiveResponse(uint8_t *response, uint8_t size)
   return API_PN532_HAL_I2C_Read(PN532aDDRESS, response, size) ? PN532oK : PN532bADrESPONSE;
 }
 
+/**
+  * @brief  Implements the logic transaction.
+  * @param  uint8_t *command: pointer to the allocated buffer with the correct size.
+  * @param  uint8_t commandSize: size of the stored buffer.
+  * @param  uint8_t *response: pointer to the allocated buffer with the correct size.
+  * @param  uint8_t responseSize: size of the stored buffer.
+  * @retval PN532_Error_t: enum that indicates the status of the transaction with the PN532.
+  */
+static PN532_Error_t API_PN532_Transaction(uint8_t *command, size_t commandSize, uint8_t *response, size_t responseSize)
+{
+  if(NULL != command && NULL != response && ZERO < commandSize && MAXrESPONSEsIZE >= responseSize)
+  {
+    if(PN532oK == API_PN532_SendCommand(command, commandSize))
+     {
+       API_PN532_HAL_Delay(10);
+       if (PN532oK == API_PN532_ReceiveAck())
+       {
+         API_PN532_HAL_Delay(50);
+         if(PN532oK == API_PN532_ReceiveResponse(response, responseSize))
+         {
+           return PN532oK;
+         }
+         return PN532bADrESPONSE;
+       }
+       return PN532bADaCK;
+     }
+    return PN532bADcOMMAND;
+  }
+  return PN532nOTiNITIALIZED;
+}
 /*----------------------------------------------------------------------------*/

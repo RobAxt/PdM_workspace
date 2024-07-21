@@ -100,7 +100,7 @@ int main(void)
 
   GPIO_t userButtonC8 = {USER_BtnC8_GPIO_Port, USER_BtnC8_Pin};
   GPIO_t userButtonC9 = {USER_BtnC9_GPIO_Port, USER_BtnC9_Pin};
-  FSM_t appFSM;
+  FSM_t appFSM = NULL;
   appFSM = APP_FSM_Init(userButtonC8, userButtonC9);
 
   /* USER CODE END 2 */
