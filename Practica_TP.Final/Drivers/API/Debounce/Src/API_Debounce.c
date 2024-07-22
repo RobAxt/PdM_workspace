@@ -58,8 +58,7 @@ DebounceGPI_t API_Debounce_Init(GPIO_t gpio)
 
   if(NULL != this)
   {
-    this->gpio.GPIOpin = gpio.GPIOpin;
-    this->gpio.GPIOx   = gpio.GPIOx;
+    memcpy(&this->gpio, &gpio, sizeof(GPIO_t));
     this->pushButtonPressed = false;
     this->debounceDelay = API_Delay_Init(DEBOUNCEdELAY);
     this->currentState = BUTTON_UP;
