@@ -40,14 +40,14 @@ void API_PN532_HAL_Delay(uint32_t delay)
   * @param  uint8_t address: address of the I2C device.
   * @param  uint8_t *query: pointer to the allocated buffer with the correct size.
   * @param  uint16_t querySize: size of bytes to write.
-  * @retval bool_t: returns true if the query was sent, otherwaise false
+  * @retval bool_t: returns true if the query was sent, otherwise false
   */
 bool_t API_PN532_HAL_I2C_Write(uint8_t address, uint8_t *query, uint16_t querySize)
 {
   if(HAL_I2C_Master_Transmit(&hi2c1, address<<1, query, querySize, TIMEOUT)==HAL_OK)
     return true;
   else
-	return false;
+	  return false;
 }
 
 /**

@@ -36,7 +36,7 @@ struct FSM_s
   PN532_t tagReader;
   PN532_Tag_t currentTag;
   API_HD44780_t diplayLCD;
-
+  bool_t stateLogged;
   Delay_t stateDelay;
   FSMstates_t currentState;
 };
@@ -72,13 +72,19 @@ FSM_t APP_FSM_Init(GPIO_t signInButton, GPIO_t eraseButton)
   memset(this.currentTag.uid, ZERO, MAXUIDsIZE);
   this.currentTag.size = 0;
   this.stateDelay = API_Delay_Init(STATEDELAY);
-
+  this.stateLogged = false;
   this.currentState = WAITING;
 
   if(NULL != this.addPB && NULL != this.delPB && NULL != this.diplayLCD && NULL != this.tagReader && NULL != this.stateDelay)
+  {
+    API_Logger_LogDebug((uint8_t*)"FSM Initialized");
     return &this;
+  }
   else
+  {
+    API_Logger_LogError((uint8_t*)"FSM Failed Initialization");
     return NULL;
+  }
 }
 
 /**
@@ -112,6 +118,7 @@ void APP_FSM_Update(FSM_t fsm)
         fsm->currentState = APP_FSM_InvalidState(fsm);
         break;
       default:
+        API_Logger_LogError((uint8_t*)"Unhandled state reached");
     }
   }
 }
@@ -137,11 +144,20 @@ static FSMstates_t APP_FSM_WaitingState(FSM_t fsm)
     API_HD44780_SetCursor(fsm->diplayLCD, LINE2, 0);
     API_HD44780_SendString(fsm->diplayLCD, (uint8_t*)"                ");
     nextState = WAITING;
+    if(!fsm->stateLogged)
+    {
+      API_Logger_LogDebug((uint8_t*)"Waiting Tag...");
+      fsm->stateLogged = true;
+    }
   }
   else
   {
     if(PN532oK == tagStatus)  // If Tag present go to VERIFY
+    {
+      API_Logger_LogDebug((uint8_t*)"Tag Founded, pending validation.");
+      fsm->stateLogged = false;
       nextState = VERIFY;
+    }
     else                      // Oops stay here
       nextState = WAITING;
   }
@@ -174,10 +190,19 @@ static FSMstates_t APP_FSM_VerifyState(FSM_t fsm)
       sprintf((char*)line, "%02X %02X %02X %02X    ", fsm->currentTag.uid[0], fsm->currentTag.uid[1], fsm->currentTag.uid[2], fsm->currentTag.uid[3]);
       API_HD44780_SendString(fsm->diplayLCD, (uint8_t*)line);
 
+      if(!fsm->stateLogged)
+      {
+        API_Logger_LogDebug((uint8_t*)"Valid Tag founded.");
+        fsm->stateLogged = true;
+      }
+
       if(API_Debounce_ReadKey(fsm->delPB))  // If delete Tag Button was pressed then Go to Delete...
       {
+        API_Logger_LogDebug((uint8_t*)"Deleting current Tag.");
+        fsm->stateLogged = false;
         nextState = DELETE;
       }
+
     }
     else  // The Tag is Invalid
     {
@@ -186,6 +211,8 @@ static FSMstates_t APP_FSM_VerifyState(FSM_t fsm)
 
     if(PN532nOtAG == API_PN532_ReadTag(fsm->tagReader))
     {
+      API_Logger_LogDebug((uint8_t*)"No Tag Present.");
+      fsm->stateLogged = false;
       nextState = WAITING;
     }
   }
@@ -262,14 +289,24 @@ static FSMstates_t APP_FSM_InvalidState(FSM_t fsm)
   sprintf((char*)line, "%02X %02X %02X %02X    ", fsm->currentTag.uid[0], fsm->currentTag.uid[1], fsm->currentTag.uid[2], fsm->currentTag.uid[3]);
   API_HD44780_SendString(fsm->diplayLCD, (uint8_t*)line);
 
+  if(!fsm->stateLogged)
+  {
+    API_Logger_LogDebug((uint8_t*)"Invalid Tag founded.");
+    fsm->stateLogged = true;
+  }
+
   if(API_Debounce_ReadKey(fsm->addPB)) // If add Tag Button was pressed then Go to Add...
   {
+    API_Logger_LogDebug((uint8_t*)"Adding current Tag.");
+    fsm->stateLogged = false;
     nextState = ADD;
   }
   else
   {
     if(PN532oK != API_PN532_ReadTag(fsm->tagReader))
     {
+      API_Logger_LogDebug((uint8_t*)"No Tag Present.");
+      fsm->stateLogged = false;
       nextState = WAITING;
     }
   }

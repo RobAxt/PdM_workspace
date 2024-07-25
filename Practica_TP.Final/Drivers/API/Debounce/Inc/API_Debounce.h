@@ -12,6 +12,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 #include "API_Delay.h"
 #include "API_Debounce_HAL.h"
 
@@ -19,7 +20,7 @@
 
 /* Exported constants --------------------------------------------------------*/
 
-#define MAXdEBOUNCEiNTANCES 5
+#define MAXdEBOUNCEiNTANCES 2
 
 /*----------------------------------------------------------------------------*/
 

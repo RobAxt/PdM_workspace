@@ -13,11 +13,12 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
-#include "APP_UserADM.h"
-#include "API_Delay.h"
-#include "API_Debounce.h"
-#include "API_HD44780.h"
 #include "API_PN532.h"
+#include "API_Delay.h"
+#include "API_Logger.h"
+#include "APP_UserADM.h"
+#include "API_HD44780.h"
+#include "API_Debounce.h"
 
 /*----------------------------------------------------------------------------*/
 
@@ -27,6 +28,11 @@
 /*----------------------------------------------------------------------------*/
 
 /* Exported types ------------------------------------------------------------*/
+
+#ifndef BOOL_TYPE_DEFINITIOON_
+#define BOOL_TYPE_DEFINITIOON_
+typedef bool bool_t;
+#endif // BOOL_TYPE_DEFINITIOON_
 
 typedef struct FSM_s * FSM_t;
 

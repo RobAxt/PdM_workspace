@@ -1,17 +1,18 @@
 /*
- * API_Delay.h
+ * API_Logger_HAL.h
  *
- *  Created on: Jul 13, 2024
+ *  Created on: Jul 25, 2024
  *      Author: raxt
  */
 
-#ifndef API_DELAY_INC_API_DELAY_H_
-#define API_DELAY_INC_API_DELAY_H_
+#ifndef API_LOGGER_INC_API_LOGGER_HAL_H_
+#define API_LOGGER_INC_API_LOGGER_HAL_H_
 
 /* Includes ------------------------------------------------------------------*/
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "stm32f4xx_hal.h"
 
 /*----------------------------------------------------------------------------*/
 
@@ -22,24 +23,18 @@
 typedef bool bool_t;
 #endif // BOOL_TYPE_DEFINITIOON_
 
-typedef uint32_t tick_t;
-
-typedef struct Delay_s * Delay_t;
-
 /*----------------------------------------------------------------------------*/
 
 /* Exported constants --------------------------------------------------------*/
 
-#define MAXdELAY          60000
-#define MAXdELAYiNTANCES      4
 
 /*----------------------------------------------------------------------------*/
 
 /* Exported functions ------------------------------------------------------- */
 
-Delay_t API_Delay_Init(tick_t duration);
-bool_t  API_Delay_DelayTimeOut(Delay_t delay);
-void    API_Delay_DelayDuration(Delay_t delay, tick_t duration);
+uint32_t API_Logger_HAL_Time(void);
+bool_t API_Logger_HAL_UARTTx(uint8_t *data, uint8_t dataSize);
 
 /*----------------------------------------------------------------------------*/
-#endif /* API_DELAY_INC_API_DELAY_H_ */
+
+#endif /* API_LOGGER_INC_API_LOGGER_HAL_H_ */
