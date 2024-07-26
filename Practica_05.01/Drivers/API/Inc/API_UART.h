@@ -21,8 +21,9 @@ typedef bool bool_t;
 #endif // BOOL_TYPE_DEFINITIOON_
 
 /* Exported constants --------------------------------------------------------*/
-#define MAXbUFFER                         256
-#define TIMEOUT                          5000
+#define MAXbUFFER                           256
+#define TxTIMEOUT                          5000
+#define RxTIMEOUT                            10
 #define USARTx                           USART3
 #define USARTx_CLK_ENABLE()              __HAL_RCC_USART3_CLK_ENABLE();
 #define USARTx_RX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOD_CLK_ENABLE()

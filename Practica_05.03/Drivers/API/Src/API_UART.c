@@ -18,9 +18,9 @@ static void Error_Handler(void);
 /* Public functions ----------------------------------------------------------*/
 
 /**
-  * @brief  ...
+  * @brief  Initialize UART
   * @param  None.
-  * @retval bool_t.
+  * @retval bool_t: return true if correct otherwise false
   */
 bool_t uartInit(void)
 {
@@ -45,9 +45,9 @@ bool_t uartInit(void)
 }
 
 /**
-  * @brief  ...
-  * @param  None.
-  * @retval bool_t.
+  * @brief  Send a complete null terminated array of characters
+  * @param  uint8_t * pstring: null terminated array of characters
+  * @retval None
   */
 void uartSendString(uint8_t * pstring)
 {
@@ -62,9 +62,10 @@ void uartSendString(uint8_t * pstring)
 }
 
 /**
-  * @brief  ...
-  * @param  None.
-  * @retval bool_t.
+  * @brief  Send some size of a null terminated array of characters
+  * @param  uint8_t * pstring: null terminated array of characters
+  * @param  uint16_t size: sending the first "size" character of pstring
+  * @retval None
   */
 void uartSendStringSize(uint8_t * pstring, uint16_t size)
 {
@@ -78,9 +79,10 @@ void uartSendStringSize(uint8_t * pstring, uint16_t size)
 }
 
 /**
-  * @brief  ...
-  * @param  None.
-  * @retval bool_t.
+  * @brief  Receive size number of character
+  * @param  uint8_t * pstring: pointer to the reserved size
+  * @param  uint16_t size: number of characters to receive
+  * @retval None
   */
 void uartReceiveStringSize(uint8_t * pstring, uint16_t size)
 {
@@ -94,6 +96,12 @@ void uartReceiveStringSize(uint8_t * pstring, uint16_t size)
 }
 
 /* Private API code ----------------------------------------------------------*/
+
+/**
+  * @brief  Handle error function
+  * @param  None
+  * @retval None
+  */
 static void Error_Handler(void)
 {
   while (1)
