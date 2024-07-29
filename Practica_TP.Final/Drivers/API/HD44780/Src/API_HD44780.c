@@ -51,8 +51,7 @@ struct API_HD44780_s
 #define SMdISPLAY       0x08   // SHIFTmODE | Shift Display
 #define SMlEFT          0x00   // SHIFTmODE | Shift to Left
 #define SMrIGHT         0x04   // SHIFTmODE | Shift to Right
-#define INITcMD1        0x30   // Magical init command 1
-#define INITcMD2        0x20   // Magical init command 2
+#define BYTEmODE        0x32   // Function set to 8-bit mode
 #define NIBBLEmODE      0x28   // Function Set | Nibble Bus | 2 Lines LCD | 5x7 Character Matrix
 #define SETDDRAM        0x80   // SETDDRAM | address
 
@@ -155,7 +154,8 @@ API_HD44780_t API_HD44780_Init(uint8_t address, backlight_t backLight)
 static void API_HD44780_InitLCD(API_HD44780_t lcdInstance)
 {
   const uint8_t initCommands[] = {
-		                               NIBBLEmODE, DISPLAYmODE|DMdISPLAYoFF|DMcURSORoFF,
+                                   BYTEmODE+1, BYTEmODE, NIBBLEmODE,
+                                   DISPLAYmODE|DMdISPLAYoFF|DMcURSORoFF,
 		                               RETURNhOME, ENTRYmODE|EMnORMAL|EMiNCREMENT,
                                    DISPLAYmODE|DMdISPLAYoN|DMcURSORoFF, CLEARdISPLAY
                                  };
@@ -163,14 +163,6 @@ static void API_HD44780_InitLCD(API_HD44780_t lcdInstance)
 
   if(NULL != lcdInstance)
   {
-    API_HD44780_HAL_Delay(DELAY20MS);
-    API_HD44780_Write_DataNibble(lcdInstance, INITcMD1, RScMD, RWwRITE);
-    API_HD44780_HAL_Delay(DELAY10MS);
-    API_HD44780_Write_DataNibble(lcdInstance, INITcMD1, RScMD, RWwRITE);
-    API_HD44780_HAL_Delay(DELAY1MS);
-    API_HD44780_Write_DataNibble(lcdInstance, INITcMD1, RScMD, RWwRITE);
-    API_HD44780_Write_DataNibble(lcdInstance, INITcMD2, RScMD, RWwRITE);
-
     for(uint8_t i=0; i<MAXcOMMANDS; i++)
       API_HD44780_Write_Data(lcdInstance, initCommands[i], RScMD, RWwRITE);
   }
@@ -186,7 +178,7 @@ void API_HD44780_ClearDisplay(API_HD44780_t lcdInstance)
   if(NULL != lcdInstance)
   {
     API_HD44780_Write_Data(lcdInstance, CLEARdISPLAY, RScMD, RWwRITE);
-    API_HD44780_HAL_Delay(DELAY2MS);
+    API_HD44780_HAL_Delay(DELAY1MS);
   }
 }
 
