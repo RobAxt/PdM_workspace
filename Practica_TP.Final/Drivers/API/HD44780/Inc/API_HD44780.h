@@ -18,6 +18,7 @@
  *    │         HD44780          │
  *    └──────────────────────────┘
  *  * P3 is connected to a transistor that turns on/off the backlight
+ *  Reference: https://msoe.us/taylor/tutorial/ce2800/lcddisplay.htm
  */
 
 #ifndef API_HD44780_INC_API_HD44780_H_

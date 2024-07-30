@@ -154,10 +154,10 @@ API_HD44780_t API_HD44780_Init(uint8_t address, backlight_t backLight)
 static void API_HD44780_InitLCD(API_HD44780_t lcdInstance)
 {
   const uint8_t initCommands[] = {
-                                   BYTEmODE+1, BYTEmODE, NIBBLEmODE,
-                                   DISPLAYmODE|DMdISPLAYoFF|DMcURSORoFF,
-		                               RETURNhOME, ENTRYmODE|EMnORMAL|EMiNCREMENT,
-                                   DISPLAYmODE|DMdISPLAYoN|DMcURSORoFF, CLEARdISPLAY
+                                   BYTEmODE | CLEARdISPLAY, BYTEmODE, NIBBLEmODE,
+                                   DISPLAYmODE | DMdISPLAYoFF | DMcURSORoFF,
+		                               RETURNhOME, ENTRYmODE | EMnORMAL | EMiNCREMENT,
+                                   DISPLAYmODE | DMdISPLAYoN | DMcURSORoFF, CLEARdISPLAY
                                  };
   const uint8_t MAXcOMMANDS = sizeof(initCommands)/sizeof(initCommands[0]);
 
