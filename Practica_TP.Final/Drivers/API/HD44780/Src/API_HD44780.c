@@ -63,7 +63,7 @@ struct API_HD44780_s
 /* Private function prototypes -----------------------------------------------*/
 
 static void API_HD44780_Write_DataNibble(API_HD44780_t lcdInstance, uint8_t nibble, uint8_t rs, uint8_t rw);
-static void API_HD44780_Write_Data(API_HD44780_t lcdInstance, uint8_t nibble, uint8_t rs, uint8_t rw);
+static void API_HD44780_Write_Data(API_HD44780_t lcdInstance, uint8_t byte, uint8_t rs, uint8_t rw);
 static void API_HD44780_InitLCD(API_HD44780_t lcdInstance);
 
 /*----------------------------------------------------------------------------*/
