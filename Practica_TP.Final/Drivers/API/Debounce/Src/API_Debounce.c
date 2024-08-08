@@ -22,6 +22,12 @@
 
 typedef enum
 {
+  DOWN = 0,
+  UP
+} pushButtonState_t;
+
+typedef enum
+{
   BUTTON_UP,
   BUTTON_FALLING,
   BUTTON_DOWN,
@@ -140,7 +146,7 @@ bool_t API_Debounce_ReadKey(DebounceGPI_t pushButton)
 /**
   * @brief  Allocates memory for the DebounceGPI_s structure
   * @param  None
-  * @retval DebounceGPI_t if the MAXdEBOUNCEiNTANCES is not exceded,
+  * @retval DebounceGPI_t if the MAXdEBOUNCEiNTANCES is not exceeded,
   *         will return the pointer of the DebounceGPI_s
   */
 DebounceGPI_t API_Debounce_AllocateInstance(void)

@@ -29,12 +29,6 @@ typedef struct
   uint16_t GPIOpin;
 } GPIO_t;
 
-typedef enum
-{
-  DOWN = 0,
-  UP
-} pushButtonState_t;
-
 /*----------------------------------------------------------------------------*/
 
 /* Exported functions ------------------------------------------------------- */
