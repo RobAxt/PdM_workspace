@@ -38,8 +38,8 @@
 #define VALIDmAXaSCII     0x7F  // HD44780 datasheet table 4 "Correspondence between Character Codes and Character Patterns"
 #define DISPLAYlINES      2
 #define DISPLAYlINEsIZE   16
-#define LINE1		      0x01
-#define LINE2		      0x02
+#define LINE1		          0x01
+#define LINE2		          0x02
 #define NOaDDRESS         0
 
 /*----------------------------------------------------------------------------*/
